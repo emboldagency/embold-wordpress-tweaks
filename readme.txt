@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.2.2
-Stable tag: 0.2.2
+Stable tag: 0.2.3
 Requires PHP: 8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -36,10 +36,13 @@ the test email.
 
 == Changelog ==
 
+= 0.2.3 =
+* Plugin update key now stored remotely
+
 = 0.2.2 =
 * Add plugin update ability
 
 == Upgrade Notice ==
 
-= 0.2.2 =
-Allow the ability for the plugin to be updated via the admin.
+= 0.2.3 =
+The GitHub token for updating the plugin is no longer stored in the repo or on the server, but remotely on our server.

@@ -4,7 +4,7 @@
  * Plugin Name:        emBold Wordpress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            0.2.2
+ * Version:            0.2.3
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -21,14 +21,17 @@ require_once plugin_dir_path(__FILE__) . 'includes/EmboldWordpressTweaks.php';
 require 'plugin-update-checker/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
-$emboldUpdateChecker = PucFactory::buildUpdateChecker(
+$embold_update_checker = PucFactory::buildUpdateChecker(
 	'https://github.com/emboldagency/embold-wordpress-tweaks/',
 	__FILE__,
 	'embold-wordpress-tweaks'
 );
 
-$emboldUpdateChecker->setAuthentication('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');
-$emboldUpdateChecker->getVcsApi()->enableReleaseAssets();
+$update_key_url = 'https://embold.net/api/wp-plugin-key';
+$update_key = file_get_contents($update_key_url);
+
+$embold_update_checker->setAuthentication($update_key);
+$embold_update_checker->getVcsApi()->enableReleaseAssets();
 
 // Plugin initialization
 function embold_wordpress_tweaks_init() {
