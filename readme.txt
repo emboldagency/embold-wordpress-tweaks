@@ -1,14 +1,12 @@
-=== Plugin Name ===
+=== emBold Wordpress Tweaks ===
 Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.2.2
-Stable tag: 0.2.3
+Stable tag: 0.2.4
 Requires PHP: 8.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Here is a short description of the plugin.  This should be no more than 150 characters.  No markup here.
+A collection of our common tweaks and upgrades to WordPress.
 
 == Description ==
 
@@ -25,9 +23,7 @@ email sent out from local.
 
 Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
 
-```php
-define('WP_ENVIRONMENT_TYPE', 'development');
-```
+`define('WP_ENVIRONMENT_TYPE', 'development');`
 
 ## Enabling local Mailgun 
 
@@ -35,6 +31,9 @@ Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This wi
 the test email.
 
 == Changelog ==
+
+= 0.2.4 =
+* Trim the value pulled for the GitHub token and fallback if key missing.
 
 = 0.2.3 =
 * Plugin update key now stored remotely
@@ -44,5 +43,5 @@ the test email.
 
 == Upgrade Notice ==
 
-= 0.2.3 =
-The GitHub token for updating the plugin is no longer stored in the repo or on the server, but remotely on our server.
+= 0.2.4 =
+* Trim the value pulled for the GitHub token and fallback if key missing.
