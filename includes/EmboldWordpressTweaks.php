@@ -18,6 +18,14 @@ class EmboldWordpressTweaks {
     }
 
     /**
+     * Disable XML-RPC.
+     */
+    public function disableXmlRpc()
+    {
+        add_filter('xmlrpc_enabled', '__return_false');
+    }
+
+    /**
      * Defer scripts to try to avoid Coders 502 errors.
      *
      * @return void

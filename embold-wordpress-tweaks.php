@@ -4,7 +4,7 @@
  * Plugin Name:        emBold Wordpress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            0.2.4
+ * Version:            0.2.5
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -42,6 +42,9 @@ function embold_wordpress_tweaks_init() {
 
     // Allow SVG uploads
     $plugin->addSvgSupport();
+
+    // Disable XML-RPC
+    $plugin->disableXmlRpc();
 
     if (wp_get_environment_type() == 'development') {
         // Defer scripts to try to avoid Coders 502 errors
