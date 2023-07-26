@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.2.2
-Stable tag: 0.2.5
+Stable tag: 0.2.6
 Requires PHP: 8.0
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -32,6 +32,9 @@ Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This wi
 the test email.
 
 == Changelog ==
+
+= 0.2.6 =
+* defer and async some additional scripts when on Coder
 
 = 0.2.5 =
 * Disable XML-RPC for security reasons.

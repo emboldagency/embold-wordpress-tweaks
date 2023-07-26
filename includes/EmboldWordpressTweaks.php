@@ -36,6 +36,7 @@ class EmboldWordpressTweaks {
             $scripts_to_defer = [
                 'common',
                 'wp-menu',
+                'post-edit',
             ];
         
             foreach ($scripts_to_defer as $defer_script) {
@@ -65,6 +66,10 @@ class EmboldWordpressTweaks {
                 'wplink',
                 'jquery-ui-autocomplete',
                 'media-upload',
+                'media-views',
+                'media-editor',
+                'rich-text',
+                'media-audiovideo',
                 'wp-block-styles',
                 'wp-block-directory',
                 'wp-format-library',
