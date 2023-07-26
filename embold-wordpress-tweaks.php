@@ -4,7 +4,7 @@
  * Plugin Name:        emBold Wordpress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            0.2.6
+ * Version:            0.2.7
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
