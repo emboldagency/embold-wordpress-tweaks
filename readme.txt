@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.2.2
-Stable tag: 0.2.7
+Stable tag: 0.3.2
 Requires PHP: 8.0
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -32,6 +32,9 @@ Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This wi
 the test email.
 
 == Changelog ==
+
+= 0.3.0 =
+* remove linebreaks from img tags if litespeed enabled
 
 = 0.2.7 =
 * now stop deferring a few scripts

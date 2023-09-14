@@ -106,4 +106,24 @@ class EmboldWordpressTweaks {
             });
         }
     }
+
+    /**
+     * Remove line breaks from img tags if litespeed-cache is enabled
+     */
+    public function removeLineBreaksFromImgTags()
+    {
+        function remove_line_breaks($match) {
+            return preg_replace("/[\r\n]+/", " ", $match[0]);
+        }
+        
+        if (is_plugin_active('litespeed-cache/litespeed-cache.php')) {
+            // Define the content filter function inline
+            add_filter('litespeed_buffer_before', function ($content) {
+                // Use a regular expression to remove line breaks from img tags
+                $content = preg_replace_callback('/<img[^>]*>/i', 'remove_line_breaks', $content);
+        
+                return $content;
+            }, 0);
+        }
+    }
 }

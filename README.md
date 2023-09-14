@@ -7,6 +7,7 @@ There are common changes we normally have to make in every generic WordPress web
 3. Local only: Disable all "wp_mail" functions so Mailgun can't randomly mass email users. This will also break the test
 email sent out from local.
 4. Disable the XML-RPC functionality.
+5. Remove line breaks from img tags if litespeed cache plugin is active.
 
 ## Requirements
 
