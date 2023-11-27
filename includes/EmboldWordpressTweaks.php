@@ -112,17 +112,20 @@ class EmboldWordpressTweaks {
      */
     public function removeLineBreaksFromImgTags()
     {
-        if (is_plugin_active('litespeed-cache/litespeed-cache.php')) {
+        // Check if the is_plugin_active function exists and if the Litespeed Cache plugin is active
+        if (function_exists('is_plugin_active') && is_plugin_active('litespeed-cache/litespeed-cache.php')) {
             // Define the content filter function inline
             add_filter('litespeed_buffer_before', function ($content) {
+                // Remove extra spaces and newlines from img tags in the content
                 preg_match_all('/<img[^>]*>/i', $content, $matches);
                 foreach ($matches[0] as $match) {
                     $cleaned_tag = preg_replace("/\s+/", " ", $match);
                     $cleaned_tag = str_replace(array("\r", "\n"), '', $cleaned_tag);
                     $content = str_replace($match, $cleaned_tag, $content);
                 }
-                return  $content;
+                return $content;
             }, 0);
         }
+
     }
 }
