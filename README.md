@@ -8,6 +8,8 @@ There are common changes we normally have to make in every generic WordPress web
 email sent out from local.
 4. Disable the XML-RPC functionality.
 5. Remove line breaks from img tags if litespeed cache plugin is active.
+6. Allow searching for posts/pages by slug in the admin panel using the prefix `slug:` before the search term.
+7. Adds a slug column to the posts/pages tables in the admin panel.
 
 ## Requirements
 

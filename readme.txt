@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.3.1
-Stable tag: 0.3.4
+Stable tag: 0.4.0
 Requires PHP: 8.0
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -19,6 +19,9 @@ There are common changes we normally have to make in every generic WordPress web
 3. Local only: Disable all "wp_mail" functions so Mailgun can't randomly mass email users. This will also break the test
 email sent out from local.
 4. Disable XML-RPC for security reasons.
+5. Remove line breaks from img tags if litespeed cache plugin is active.
+6. Allow searching for posts/pages by slug in the admin panel using the prefix `slug:` before the search term.
+7. Adds a slug column to the posts/pages tables in the admin panel.
 
 ## Requirements
 
@@ -32,6 +35,9 @@ Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This wi
 the test email.
 
 == Changelog ==
+
+= 0.4.0 =
+* show post/page slugs in the admin panel and enable slug search
 
 = 0.3.4 =
 * check for is_plugin_active function existing before using it
