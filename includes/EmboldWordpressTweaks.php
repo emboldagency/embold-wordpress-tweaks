@@ -135,6 +135,7 @@ class EmboldWordpressTweaks {
     {
         // search by slug
         add_filter('posts_search', function ($search, \WP_Query $q) use (&$wpdb) {
+            global $wpdb;
             // Nothing to do
             if (
                 !did_action('load-edit.php')
