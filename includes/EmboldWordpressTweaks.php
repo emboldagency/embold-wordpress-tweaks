@@ -126,6 +126,106 @@ class EmboldWordpressTweaks {
                 return $content;
             }, 0);
         }
+    }
 
+    /**
+     * Show post/page slugs in the admin panel and enable slug search
+     */
+    public function addSlugSearchAndColumns()
+    {
+        // search by slug
+        add_filter('posts_search', function ($search, \WP_Query $q) use (&$wpdb) {
+            // Nothing to do
+            if (
+                !did_action('load-edit.php')
+                || !is_admin()
+                || !$q->is_search()
+                || !$q->is_main_query()
+            )
+                return $search;
+
+            // Get the search input
+            $s = $q->get('s');
+
+            // Check for "slug:" part in the search input
+            if ('slug:' === mb_substr(trim($s), 0, 5)) {
+                // Override the search query 
+                $search = $wpdb->prepare(
+                    " AND {$wpdb->posts}.post_name LIKE %s ",
+                    str_replace(
+                        ['**', '*'],
+                        ['*',  '%'],
+                        mb_strtolower(
+                            $wpdb->esc_like(
+                                trim(mb_substr($s, 5))
+                            )
+                        )
+                    )
+                );
+
+                // Adjust the ordering
+                $q->set('orderby', 'post_name');
+                $q->set('order', 'ASC');
+            }
+            return $search;
+        }, PHP_INT_MAX, 2);
+
+        // Add the custom column to the given post type 
+        function add_slug_column($post_type)
+        {
+            add_filter("manage_{$post_type}_posts_columns", function ($columns) {
+                global $post_type; // declare the global variable
+                $new = array();
+                $slug = $columns["{$post_type}_slug"] = __('Slug', 'embold-wordpress-tweaks');
+                // save the slug column 
+                unset($columns["{$post_type}_slug"]);
+                // remove it from the columns list 
+                foreach ($columns as $key => $value) {
+                    if ($key == 'title') {
+                        // when we find the title column 
+                        $new['title'] = $value;
+                        // put the title column first 
+                        $new["{$post_type}_slug"] = $slug;
+                        // put the slug column after it 
+                    } else {
+                        $new[$key] = $value;
+                        // put the rest of the columns 
+                    }
+                }
+                return $new;
+            });
+        }
+
+        // Display the slug in the custom column for the given post type 
+        function show_slug_column($post_type)
+        {
+            add_action("manage_{$post_type}_posts_custom_column", function ($column, $post_id) use ($post_type) {
+                if (
+                    $column == "{$post_type}_slug"
+                ) {
+                    echo get_post_field('post_name', $post_id, 'raw');
+                }
+            }, 10, 2);
+        }
+
+        // Modify the query to include the slug in the search for the given post type 
+        function search_by_slug($post_type)
+        {
+            add_filter('pre_get_posts', function ($query) use ($post_type) {
+                if ($query->is_main_query() && $query->is_search() && !is_admin()) {
+                    $query->set('post_type', $post_type);
+                    $query->set('name', $query->get('s'));
+                }
+                return $query;
+            });
+        }
+
+        // Apply the functions for page and post post types
+        $post_types = array('page', 'post');
+        foreach ($post_types as $post_type) {
+            add_slug_column($post_type);
+            show_slug_column($post_type);
+            search_by_slug($post_type);
+        }
     }
 }
