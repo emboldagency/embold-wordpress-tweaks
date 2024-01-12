@@ -4,7 +4,7 @@
  * Plugin Name:        emBold Wordpress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            0.5.0
+ * Version:            0.6.0
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -27,26 +27,8 @@ $embold_update_checker = PucFactory::buildUpdateChecker(
 	'embold-wordpress-tweaks'
 );
 
-$update_key_url = 'https://embold.net/api/wp-plugin-key';
-
-// Initialize cURL session
-$ch = curl_init($update_key_url);
-
-// Set cURL options
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_TIMEOUT, 0.2); // Set timeout in seconds
-
-// Execute cURL session
-$update_key = @curl_exec($ch);
-
-if ($update_key !== false && ($update_key = trim($update_key))) {
-    // Close cURL session
-    curl_close($ch);
-
-    // Set authentication and enable release assets
-    $embold_update_checker->setAuthentication($update_key);
-    $embold_update_checker->getVcsApi()->enableReleaseAssets();
-}
+// Set authentication and enable release assets
+$embold_update_checker->getVcsApi()->enableReleaseAssets();
 
 // Plugin initialization
 function embold_wordpress_tweaks_init() {
@@ -67,10 +49,10 @@ function embold_wordpress_tweaks_init() {
 
     if (wp_get_environment_type() == 'development') {
         // Defer scripts to try to avoid Coders 502 errors
-        $plugin->deferScripts();
+        // $plugin->deferScripts();
 
         // Async scripts to try to avoid Coders 502 errors
-        $plugin->asyncScripts();
+        // $plugin->asyncScripts();
 
         // Disable an array of mail plugins
         $plugin->disableAllKnownMailPlugins();
