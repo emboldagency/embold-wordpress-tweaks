@@ -4,7 +4,7 @@
  * Plugin Name:        emBold Wordpress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            0.6.0
+ * Version:            0.7.0
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -46,6 +46,8 @@ function embold_wordpress_tweaks_init() {
 
     // Show post/page slugs in the admin panel and enable slug search
     $plugin->addSlugSearchAndColumns();
+
+    $plugin->disableEscapingAcfShortcodes();
 
     if (wp_get_environment_type() == 'development') {
         // Defer scripts to try to avoid Coders 502 errors

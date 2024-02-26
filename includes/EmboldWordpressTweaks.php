@@ -38,21 +38,21 @@ class EmboldWordpressTweaks {
                 'wp-menu',
                 'post-edit',
             ];
-        
+
             foreach ($scripts_to_defer as $defer_script) {
                 if ($defer_script === $handle) {
                     return str_replace(' src', " defer='defer' src", $tag);
                 }
             }
-        
+
             return $tag;
         }, 10, 2);
     }
 
     /**
      * Async scripts to try to avoid Coders 502 errors.
-     * 
-     * @return void 
+     *
+     * @return void
      */
     public function asyncScripts()
     {
@@ -79,13 +79,13 @@ class EmboldWordpressTweaks {
                 'references',
                 'style-engine',
             ];
-        
+
             foreach ($scripts_to_async as $async_script) {
                 if ($async_script === $handle) {
                     return str_replace(' src', ' async src', $tag);
                 }
             }
-        
+
             return $tag;
         }, 10, 2);
     }
@@ -150,7 +150,7 @@ class EmboldWordpressTweaks {
 
             // Check for "slug:" part in the search input
             if ('slug:' === mb_substr(trim($s), 0, 5)) {
-                // Override the search query 
+                // Override the search query
                 $search = $wpdb->prepare(
                     " AND {$wpdb->posts}.post_name LIKE %s ",
                     str_replace(
@@ -171,33 +171,33 @@ class EmboldWordpressTweaks {
             return $search;
         }, PHP_INT_MAX, 2);
 
-        // Add the custom column to the given post type 
+        // Add the custom column to the given post type
         function add_slug_column($post_type)
         {
             add_filter("manage_{$post_type}_posts_columns", function ($columns) {
                 global $post_type; // declare the global variable
                 $new = array();
                 $slug = $columns["{$post_type}_slug"] = __('Slug', 'embold-wordpress-tweaks');
-                // save the slug column 
+                // save the slug column
                 unset($columns["{$post_type}_slug"]);
-                // remove it from the columns list 
+                // remove it from the columns list
                 foreach ($columns as $key => $value) {
                     if ($key == 'title') {
-                        // when we find the title column 
+                        // when we find the title column
                         $new['title'] = $value;
-                        // put the title column first 
+                        // put the title column first
                         $new["{$post_type}_slug"] = $slug;
-                        // put the slug column after it 
+                        // put the slug column after it
                     } else {
                         $new[$key] = $value;
-                        // put the rest of the columns 
+                        // put the rest of the columns
                     }
                 }
                 return $new;
             });
         }
 
-        // Display the slug in the custom column for the given post type 
+        // Display the slug in the custom column for the given post type
         function show_slug_column($post_type)
         {
             add_action("manage_{$post_type}_posts_custom_column", function ($column, $post_id) use ($post_type) {
@@ -209,7 +209,7 @@ class EmboldWordpressTweaks {
             }, 10, 2);
         }
 
-        // Modify the query to include the slug in the search for the given post type 
+        // Modify the query to include the slug in the search for the given post type
         function search_by_slug($post_type)
         {
             add_filter('pre_get_posts', function ($query) use ($post_type) {
@@ -227,6 +227,23 @@ class EmboldWordpressTweaks {
             add_slug_column($post_type);
             show_slug_column($post_type);
             search_by_slug($post_type);
+        }
+    }
+
+    /**
+     * Disable escaping ACF shortcode content introduced in ACF 6.2.5
+     */
+    public function disableEscapingAcfShortcodes()
+    {
+        // Check if the is_plugin_active function exists and if the ACF plugin is active
+        if (function_exists('is_plugin_active') && (is_plugin_active('advanced-custom-fields/acf.php') || is_plugin_active('advanced-custom-fields-pro/acf.php'))) {
+            add_filter( 'acf/shortcode/allow_unsafe_html', function ( $allowed, $atts ) {
+                // always return true, no matter which ACF shortcode is being used
+                return true;
+            }, 10, 2 );
+
+            // Disable the notice about this in the admin
+            add_filter( 'acf/admin/prevent_escaped_html_notice', '__return_true' );
         }
     }
 }

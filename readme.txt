@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.3.1
-Stable tag: 0.6.0
+Stable tag: 0.7.0
 Requires PHP: 8.0
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -29,12 +29,15 @@ Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
 
 `define('WP_ENVIRONMENT_TYPE', 'development');`
 
-## Enabling local Mailgun 
+## Enabling local Mailgun
 
 Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This will let you send emails from local including
 the test email.
 
 == Changelog ==
+
+= 0.7.0 =
+* disable ACF shortcode content escaping
 
 = 0.6.0 =
 * go open source, remove coder async defer scripts
