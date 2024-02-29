@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.3.1
-Stable tag: 0.8.0
+Stable tag: 0.8.1
 Requires PHP: 8.0
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -35,6 +35,9 @@ Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This wi
 the test email.
 
 == Changelog ==
+
+= 0.8.1 =
+* fix for search-by-slug sometimes breaking frontend results
 
 = 0.8.0 =
 * disable ACF shortcode content escaping

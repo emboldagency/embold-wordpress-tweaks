@@ -2,7 +2,8 @@
 
 namespace App;
 
-class EmboldWordpressTweaks {
+class EmboldWordpressTweaks
+{
     /**
      * Add SVG support.
      *
@@ -209,24 +210,11 @@ class EmboldWordpressTweaks {
             }, 10, 2);
         }
 
-        // Modify the query to include the slug in the search for the given post type
-        function search_by_slug($post_type)
-        {
-            add_filter('pre_get_posts', function ($query) use ($post_type) {
-                if ($query->is_main_query() && $query->is_search() && !is_admin()) {
-                    $query->set('post_type', $post_type);
-                    $query->set('name', $query->get('s'));
-                }
-                return $query;
-            });
-        }
-
         // Apply the functions for page and post post types
         $post_types = array('page', 'post');
         foreach ($post_types as $post_type) {
             add_slug_column($post_type);
             show_slug_column($post_type);
-            search_by_slug($post_type);
         }
     }
 
@@ -237,13 +225,13 @@ class EmboldWordpressTweaks {
     {
         // Check if the is_plugin_active function exists and if the ACF plugin is active
         if (function_exists('is_plugin_active') && (is_plugin_active('advanced-custom-fields/acf.php') || is_plugin_active('advanced-custom-fields-pro/acf.php'))) {
-            add_filter( 'acf/shortcode/allow_unsafe_html', function ( $allowed, $atts ) {
+            add_filter('acf/shortcode/allow_unsafe_html', function ($allowed, $atts) {
                 // always return true, no matter which ACF shortcode is being used
                 return true;
-            }, 10, 2 );
+            }, 10, 2);
 
             // Disable the notice about this in the admin
-            add_filter( 'acf/admin/prevent_escaped_html_notice', '__return_true' );
+            add_filter('acf/admin/prevent_escaped_html_notice', '__return_true');
         }
     }
 }
