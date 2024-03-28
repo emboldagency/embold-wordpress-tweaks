@@ -13,13 +13,27 @@ email sent out from local.
 
 ## Requirements
 
-Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
+1. Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
 
 ```php
 define('WP_ENVIRONMENT_TYPE', 'development');
 ```
 
-## Enabling local Mailgun 
+2. Make sure that our user account for the site is set to info@embold.com
+
+## Disable User Account Restrictions
+
+Define 'LOOSE_USER_RESTRICTIONS' in the wp-config and set it to true, this will disable all of our theme, plugin, and
+file protections put in place by the plugin.
+
+## Additional Elevated User Accounts
+
+Define the 'ELEVATED_EMAILS' as an array in your local wp-config.php - these account emails will be able to manage plugins
+and themes, but they will still be disabled from editing php files directly.
+
+`define('ELEVATED_EMAILS', ['worf@embold.com', 'spock@embold.com']);`
+
+## Enabling local Mailgun
 
 Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This will let you send emails from local including
 the test email.
