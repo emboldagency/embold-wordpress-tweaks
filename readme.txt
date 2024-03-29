@@ -3,8 +3,8 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.3.1
-Stable tag: 1.0.0
-Requires PHP: 8.0
+Stable tag: 1.0.1
+Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
 
