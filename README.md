@@ -33,6 +33,9 @@ and themes, but they will still be disabled from editing php files directly.
 
 `define('ELEVATED_EMAILS', ['worf@embold.com', 'spock@embold.com']);`
 
+This only needs set on production if we don't have an info@embold.com account there. Then this should be set on production to
+whatever our admin email is.
+
 ## Enabling local Mailgun
 
 Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This will let you send emails from local including
