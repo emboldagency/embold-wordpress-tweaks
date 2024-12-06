@@ -32,6 +32,9 @@ Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
 
 == Changelog ==
 
+= 1.1.0 =
+* Add info@wphaven.app to default emails
+
 = 1.0.0 =
 * Disable plugin, theme, and file editing for accounts that are now designated as super admins via the wp-config
 

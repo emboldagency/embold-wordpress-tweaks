@@ -19,7 +19,7 @@ email sent out from local.
 define('WP_ENVIRONMENT_TYPE', 'development');
 ```
 
-2. Make sure that our user account for the site is set to info@embold.com
+2. Make sure that our user account for the site is set to info@embold.com or info@wphaven.app
 
 ## Disable User Account Restrictions
 
@@ -33,7 +33,7 @@ and themes, but they will still be disabled from editing php files directly.
 
 `define('ELEVATED_EMAILS', ['worf@embold.com', 'spock@embold.com']);`
 
-This only needs set on production if we don't have an info@embold.com account there. Then this should be set on production to
+This only needs set on production if we don't have an info@embold.com or info@wphaven.app account there. Then this should be set on production to
 whatever our admin email is.
 
 ## Enabling local Mailgun

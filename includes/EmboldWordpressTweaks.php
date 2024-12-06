@@ -6,8 +6,12 @@ class EmboldWordpressTweaks
 {
     public function allowSpecificUsersToEditFiles()
     {
-        $default_email = 'info@embold.com';
-        $allowed_emails[] = $default_email;
+        $default_emails = [
+            'info@embold.com',
+            'info@wphaven.app',
+        ];
+
+        $allowed_emails = $default_emails;
 
         if (defined('ELEVATED_EMAILS')) {
             $allowed_emails = array_merge($allowed_emails, ELEVATED_EMAILS);
@@ -15,7 +19,7 @@ class EmboldWordpressTweaks
 
         $current_user = wp_get_current_user();
 
-        if ($current_user->user_email !== $default_email) {
+        if (!in_array($current_user->user_email, $allowed_emails)) {
             add_filter('all_plugins', function ($plugins) {
                 if (isset($plugins['embold-wordpress-tweaks/embold-wordpress-tweaks.php'])) {
                     unset($plugins['embold-wordpress-tweaks/embold-wordpress-tweaks.php']);
@@ -26,7 +30,7 @@ class EmboldWordpressTweaks
 
         // Filter to disallow file edits
         add_filter('user_has_cap', function ($all_capabilities, $caps, $args) use ($allowed_emails, $current_user) {
-            if (! in_array($current_user->user_email, $allowed_emails)) {
+            if (!in_array($current_user->user_email, $allowed_emails)) {
                 $all_capabilities['activate_plugins'] = false;
                 $all_capabilities['install_plugins'] = false;
                 $all_capabilities['delete_plugins'] = false;
@@ -44,8 +48,6 @@ class EmboldWordpressTweaks
 
             return $all_capabilities;
         }, 10, 3);
-
-
     }
 
     /**
