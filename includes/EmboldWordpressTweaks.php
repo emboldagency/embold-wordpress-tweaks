@@ -31,7 +31,7 @@ class EmboldWordpressTweaks
         // Filter to disallow file edits
         add_filter('user_has_cap', function ($all_capabilities, $caps, $args) use ($allowed_emails, $current_user) {
             if (!in_array($current_user->user_email, $allowed_emails)) {
-                $all_capabilities['activate_plugins'] = false;
+                $all_capabilities['update_plugins'] = false;
                 $all_capabilities['install_plugins'] = false;
                 $all_capabilities['delete_plugins'] = false;
                 $all_capabilities['switch_themes'] = false;
