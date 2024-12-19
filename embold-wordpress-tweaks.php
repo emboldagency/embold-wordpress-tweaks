@@ -5,7 +5,7 @@
  * Plugin Name:        emBold Wordpress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            1.1.2
+ * Version:            1.1.3
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -38,7 +38,7 @@ function embold_wordpress_tweaks_init()
     // Create an instance of your plugin class
     $plugin = new \App\EmboldWordpressTweaks();
 
-    if (! defined('LOOSE_USER_RESTRICTIONS') || (defined('LOOSE_USER_RESTRICTIONS') && LOOSE_USER_RESTRICTIONS == false)) {
+    if (is_admin() && ! defined('LOOSE_USER_RESTRICTIONS') || (defined('LOOSE_USER_RESTRICTIONS') && LOOSE_USER_RESTRICTIONS == false)) {
         // Allow specific users to edit files
         $plugin->allowSpecificUsersToEditFiles();
     }
