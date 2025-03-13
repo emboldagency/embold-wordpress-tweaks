@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.3.1
-Stable tag: 1.1.4
+Stable tag: 1.2.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -31,6 +31,9 @@ Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
 `define('WP_ENVIRONMENT_TYPE', 'development');`
 
 == Changelog ==
+
+= 1.2.0 =
+* Remove Howdy from the admin bar my account menu item
 
 = 1.1.4 =
 * Also disable mail when WP_ENVIRONMENT_TYPE is 'maintenance'

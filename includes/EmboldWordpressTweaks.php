@@ -219,7 +219,7 @@ class EmboldWordpressTweaks
         }, PHP_INT_MAX, 2);
 
         // Add the custom column to the given post type
-        function add_slug_column($post_type)
+        function addSlugColumn($post_type)
         {
             add_filter("manage_{$post_type}_posts_columns", function ($columns) {
                 global $post_type; // declare the global variable
@@ -245,7 +245,7 @@ class EmboldWordpressTweaks
         }
 
         // Display the slug in the custom column for the given post type
-        function show_slug_column($post_type)
+        function showSlugColumn($post_type)
         {
             add_action("manage_{$post_type}_posts_custom_column", function ($column, $post_id) use ($post_type) {
                 if (
@@ -259,8 +259,8 @@ class EmboldWordpressTweaks
         // Apply the functions for page and post post types
         $post_types = array('page', 'post');
         foreach ($post_types as $post_type) {
-            add_slug_column($post_type);
-            show_slug_column($post_type);
+            addSlugColumn($post_type);
+            showSlugColumn($post_type);
         }
     }
 
@@ -279,5 +279,23 @@ class EmboldWordpressTweaks
             // Disable the notice about this in the admin
             add_filter('acf/admin/prevent_escaped_html_notice', '__return_true');
         }
+    }
+
+    /**
+     * Remove the "Howdy" greeting from the admin bar
+     */
+    public function removeHowdy() {
+        add_action('wp_before_admin_bar_render', function() {
+            global $wp_admin_bar;
+            $my_account = $wp_admin_bar->get_node('my-account');
+            if ($my_account) {
+                error_log('Found my-account node');
+                $greeting = str_replace('Howdy, ', '', $my_account->title);
+                $wp_admin_bar->add_node([
+                    'id' => 'my-account',
+                    'title' => $greeting,
+                ]);
+            }
+        }, 25);
     }
 }
