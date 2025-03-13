@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.3.1
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -31,6 +31,9 @@ Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
 `define('WP_ENVIRONMENT_TYPE', 'development');`
 
 == Changelog ==
+
+= 1.1.4 =
+* Also disable mail when WP_ENVIRONMENT_TYPE is 'maintenance'
 
 = 1.1.3 =
 * Don't hide the plugin from the wp cli

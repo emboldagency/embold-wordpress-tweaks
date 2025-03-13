@@ -5,7 +5,7 @@
  * Plugin Name:        emBold Wordpress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            1.1.3
+ * Version:            1.1.4
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -57,7 +57,7 @@ function embold_wordpress_tweaks_init()
 
     $plugin->disableEscapingAcfShortcodes();
 
-    $environmentsToDisableMail = ['development', 'staging', 'local'];
+    $environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
 
     if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
         // Disable an array of mail plugins
@@ -67,7 +67,7 @@ function embold_wordpress_tweaks_init()
 
 add_action('plugins_loaded', 'embold_wordpress_tweaks_init', 0);
 
-$environmentsToDisableMail = ['development', 'staging', 'local'];
+$environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
 
 // This function must be global, if we put it in our class it won't override the core function
 if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
