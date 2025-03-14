@@ -289,7 +289,6 @@ class EmboldWordpressTweaks
             global $wp_admin_bar;
             $my_account = $wp_admin_bar->get_node('my-account');
             if ($my_account) {
-                error_log('Found my-account node');
                 $greeting = str_replace('Howdy, ', '', $my_account->title);
                 $wp_admin_bar->add_node([
                     'id' => 'my-account',
