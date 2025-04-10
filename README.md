@@ -11,9 +11,17 @@ email sent out from local.
 6. Allow searching for posts/pages by slug in the admin panel using the prefix `slug:` before the search term.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 
+## To send email on staging/local
+
+Define the 'DISABLE_MAIL' as false in your wp-config.php
+
+```php
+define('DISABLE_MAIL', true);
+```
+
 ## Requirements
 
-1. Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
+Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php
 
 ```php
 define('WP_ENVIRONMENT_TYPE', 'development');

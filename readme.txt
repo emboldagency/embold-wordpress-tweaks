@@ -24,9 +24,15 @@ email sent out from local.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
 
+## To send email on staging/local
+
+Define the 'DISABLE_MAIL' as false in your wp-config.php
+
+`define('DISABLE_MAIL', true);`
+
 ## Requirements
 
-Define the 'WP_ENVIRONMENT_TYPE' as 'development' in your local wp-config.php
+Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php
 
 `define('WP_ENVIRONMENT_TYPE', 'development');`
 

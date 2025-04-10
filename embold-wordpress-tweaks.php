@@ -61,9 +61,11 @@ function embold_wordpress_tweaks_init()
 
     $environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
 
-    if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
-        // Disable an array of mail plugins
-        $plugin->disableAllKnownMailPlugins();
+    if (!defined('DISABLE_MAIL') || DISABLE_MAIL !== false) {
+        if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
+            // Disable an array of mail plugins
+            $plugin->disableAllKnownMailPlugins();
+        }
     }
 }
 
@@ -73,10 +75,13 @@ $environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
 
 // This function must be global, if we put it in our class it won't override the core function
 if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
-    if (!function_exists('wp_mail')) {
-        function wp_mail()
-        {
-            return false;
+    // if DISABLE_MAIL is not set to false in the wp-config
+    if (!defined('DISABLE_MAIL') || DISABLE_MAIL !== false) {
+        if (!function_exists('wp_mail')) {
+            function wp_mail()
+            {
+                return false;
+            }
         }
     }
 }
