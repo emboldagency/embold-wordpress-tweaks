@@ -9,13 +9,12 @@ on:
       tag:
         required: false
         type: string
-        description: 'Release tag (e.g., 1.0.0 or v1.0.0)'
+        description: 'Release tag (e.g., `1.0.0`)'
       fix:
         required: false
         type: boolean
         default: false
-        description: 'Set to true to update files, false to only check'
-
+        description: 'Enable to automatically update version numbers in plugin files to match the tag. If false, only check and fail on mismatch.'
 jobs:
   wordpress-plugin-release:
     uses: emboldagency/.github/.github/workflows/wordpress-plugin-release.yml@master
