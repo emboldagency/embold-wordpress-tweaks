@@ -38,6 +38,9 @@ Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in
 
 == Changelog ==
 
+= 1.3.0 =
+* Allow sending email on local/staging with flag
+
 = 1.2.0 =
 * Remove Howdy from the admin bar my account menu item
 
