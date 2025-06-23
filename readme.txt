@@ -3,7 +3,7 @@ Contributors: itsjsutxan
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.3.1
-Stable tag: 1.3.0
+Stable tag: 1.4.0-alpha
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -20,9 +20,10 @@ There are common changes we normally have to make in every generic WordPress web
 email sent out from local.
 4. Disable XML-RPC for security reasons.
 5. Remove line breaks from img tags if litespeed cache plugin is active.
-6. Allow searching for posts/pages by slug in the admin panel using the prefix `slug:` before the search term.
+6. Allow searching for posts/pages by slug in the admin panel using the prefix 'slug:' before the search term.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
+9. Changes the admin login URL to the value of 'EMBOLD_ADMIN_URL', if set.
 
 ## To send email on staging/local
 
@@ -37,6 +38,9 @@ Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in
 `define('WP_ENVIRONMENT_TYPE', 'development');`
 
 == Changelog ==
+
+= 1.4.0 =
+* Allow changing the admin URL with EMBOLD_ADMIN_URL constant
 
 = 1.3.0 =
 * Allow sending email on local/staging with flag
