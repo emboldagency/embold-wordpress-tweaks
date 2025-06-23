@@ -8,8 +8,10 @@ There are common changes we normally have to make in every generic WordPress web
 email sent out from local.
 4. Disable the XML-RPC functionality.
 5. Remove line breaks from img tags if litespeed cache plugin is active.
-6. Allow searching for posts/pages by slug in the admin panel using the prefix `slug:` before the search term.
+6. Allow searching for posts/pages by slug in the admin panel using the prefix 'slug:' before the search term.
 7. Adds a slug column to the posts/pages tables in the admin panel.
+8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
+9. Changes the admin login URL to the value of 'EMBOLD_ADMIN_URL', if set.
 
 ## To send email on staging/local
 
@@ -44,7 +46,11 @@ and themes, but they will still be disabled from editing php files directly.
 This only needs set on production if we don't have an info@embold.com or info@wphaven.app account there. Then this should be set on production to
 whatever our admin email is.
 
-## Enabling local Mailgun
+## Enable local Mailgun
 
 Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This will let you send emails from local including
 the test email.
+
+## Change the admin login URL
+
+Update the 'EMBOLD_ADMIN_URL' constant to the new path.

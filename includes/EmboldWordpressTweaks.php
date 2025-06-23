@@ -281,6 +281,59 @@ class EmboldWordpressTweaks
         }
     }
 
+
+    /**
+     * Hide login URL if EMBOLD_ADMIN_URL is defined in wp-config.php
+     */
+    public function hideLoginUrl()
+    {
+        if (!defined('EMBOLD_ADMIN_URL') || empty(EMBOLD_ADMIN_URL)) {
+            return;
+        }
+        $custom_login = trim(EMBOLD_ADMIN_URL, '/');
+
+        // Redirect requests to the custom login URL to wp-login.php
+        add_action('init', function () use ($custom_login) {
+            global $pagenow;
+            if (
+                $pagenow !== 'wp-login.php' &&
+                !is_admin() &&
+                preg_match('#^/' . preg_quote($custom_login, '#') . '(/|$)#', $_SERVER['REQUEST_URI'])
+            ) {
+                $_SERVER['REQUEST_URI'] = '/wp-login.php';
+                $_SERVER['SCRIPT_NAME'] = '/wp-login.php';
+                $_SERVER['PHP_SELF'] = '/wp-login.php';
+                require_once ABSPATH . 'wp-login.php';
+                exit;
+            }
+        });
+
+        // Block access to wp-login.php and wp-admin (login form) if not using the custom URL
+        add_action('init', function () use ($custom_login) {
+            if (
+                isset($_SERVER['REQUEST_URI']) &&
+                (strpos($_SERVER['REQUEST_URI'], 'wp-login.php') !== false ||
+                 (strpos($_SERVER['REQUEST_URI'], 'wp-admin') !== false && !is_user_logged_in())) &&
+                !preg_match('#^/' . preg_quote($custom_login, '#') . '(/|$)#', $_SERVER['REQUEST_URI'])
+            ) {
+                status_header(404);
+                exit;
+            }
+        }, 9);
+
+        // Filter login_url to use the custom login path
+        add_filter('login_url', function ($login_url, $redirect, $force_reauth) use ($custom_login) {
+            $url = home_url('/' . $custom_login . '/');
+            if (!empty($redirect)) {
+                $url = add_query_arg('redirect_to', urlencode($redirect), $url);
+            }
+            if ($force_reauth) {
+                $url = add_query_arg('reauth', '1', $url);
+            }
+            return $url;
+        }, 10, 3);
+    }
+
     /**
      * Remove the "Howdy" greeting from the admin bar
      */
