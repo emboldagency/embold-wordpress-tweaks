@@ -310,12 +310,15 @@ class EmboldWordpressTweaks
 
         // Block access to wp-login.php and wp-admin (login form) if not using the custom URL
         add_action('init', function () use ($custom_login) {
-            if (
-                isset($_SERVER['REQUEST_URI']) &&
-                (strpos($_SERVER['REQUEST_URI'], 'wp-login.php') !== false ||
-                 (strpos($_SERVER['REQUEST_URI'], 'wp-admin') !== false && !is_user_logged_in())) &&
-                !preg_match('#^/' . preg_quote($custom_login, '#') . '(/|$)#', $_SERVER['REQUEST_URI'])
-            ) {
+            $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
+            $is_login = strpos($request_uri, 'wp-login.php') !== false;
+            $is_admin_login = strpos($request_uri, 'wp-admin') !== false && !is_user_logged_in();
+            $is_custom = preg_match('#^/' . preg_quote($custom_login, '#') . '(/|$)#', $request_uri);
+            $is_post = strtolower($_SERVER['REQUEST_METHOD'] ?? '') === 'post';
+            $is_logged_in = is_user_logged_in();
+
+            // Only block GET requests to wp-login.php for unauthenticated users not using the custom URL
+            if ((($is_login && !$is_post && !$is_logged_in) || $is_admin_login) && !$is_custom) {
                 status_header(404);
                 exit;
             }
