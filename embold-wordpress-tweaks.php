@@ -57,8 +57,6 @@ function embold_wordpress_tweaks_init()
 
     $plugin->disableEscapingAcfShortcodes();
 
-    $plugin->hideLoginUrl();
-
     $plugin->removeHowdy();
 
     $environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
