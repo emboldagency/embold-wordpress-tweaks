@@ -1,5 +1,8 @@
 # Embold WordPress Tweaks
 
+[![Build and Deploy](https://embold.net/api/github/badge/workflow-status.php?repo=embold-wordpress-tweaks&workflow=release.yml)](https://github.com/emboldagency/embold-wordpress-tweaks/actions/workflows/release.yml) <!--
+-->![Semantic Versioning](https://embold.net/api/github/badge/semver.php?repo=embold-wordpress-tweaks)
+
 > **Note**: This is the development documentation. WordPress plugins use `readme.txt` for their official plugin information and changelog, not this README.md file.
 
 WordPress plugin that provides common tweaks and changes we normally have to make in every generic WordPress website.
