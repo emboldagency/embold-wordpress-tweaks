@@ -39,10 +39,6 @@ jobs:
       - name: Install dist-archive command
         run: wp package install wp-cli/dist-archive-command:@stable
 
-      - name: Build plugin
-        run: |
-          composer install --no-dev --prefer-dist --optimize-autoloader
-
       - name: Build distribution archive
         run: wp dist-archive . dist --create-target-dir
 
