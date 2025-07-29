@@ -23,7 +23,6 @@ email sent out from local.
 6. Allow searching for posts/pages by slug in the admin panel using the prefix 'slug:' before the search term.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
-9. Changes the admin login URL to the value of 'EMBOLD_ADMIN_URL', if set.
 
 ## To send email on staging/local
 
@@ -38,6 +37,10 @@ Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in
 `define('WP_ENVIRONMENT_TYPE', 'development');`
 
 == Changelog ==
+
+= 1.5.0 =
+* Remove EMBOLD_ADMIN_URL constant and related admin URL change feature
+* Updated development documentation and Docker setup (README.md changes only)
 
 = 1.4.0 =
 * Allow changing the admin URL with EMBOLD_ADMIN_URL constant
