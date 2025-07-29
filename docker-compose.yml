@@ -1,0 +1,50 @@
+services:
+  wordpress:
+    image: wordpress:latest
+    ports:
+      - "8080:80"
+    env_file:
+      - docker.env
+    volumes:
+      - ./:/var/www/html/wp-content/plugins/embold-wordpress-tweaks
+      - wordpress:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+
+  cli:
+    image: emboldcreative/wp-cli:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.cli
+    env_file:
+      - docker.env
+    volumes:
+      - ./:/var/www/html/wp-content/plugins/embold-wordpress-tweaks
+      - wordpress:/var/www/html
+      - wp_cli_cache:/home/www-data/.wp-cli
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles:
+      - cli
+    # Keep container running for easier package management
+    command: tail -f /dev/null
+
+  db:
+    image: mariadb:latest
+    env_file:
+      - docker.env
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  wordpress:
+  db:
+  wp_cli_cache:
