@@ -1,9 +1,9 @@
 === emBold Wordpress Tweaks ===
-Contributors: itsjsutxan
+Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
-Tested up to: 6.3.1
-Stable tag: 1.5.0
+Tested up to: 6.9.0
+Stable tag: 1.6.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -62,9 +62,12 @@ Control debug notice suppression:
 == Changelog ==
 
 = 1.6.0 =
-* Add plugin options page.
-* Improve development workflow with updated build process and doc.
-* Migrate log suppression feature from wphaven-connect to here.
+* Add plugin options page with settings.
+* Implement SMTP override functionality for non-production environments with configurable host, port, from email, and from name.
+* Migrate log suppression feature from wphaven-connect including MU-plugin template for early suppression.
+* Add support for EMBOLD_SUPPRESS_LOGS_EXTRA constant for custom notice string suppression (supports array or newline-separated string format).
+* Add plugin reset tool to clear MU-plugin when plugin is deactivated.
+* Improve development workflow with updated build process and documentation.
 
 = 1.5.0 =
 * Remove EMBOLD_ADMIN_URL constant and related admin URL change feature
