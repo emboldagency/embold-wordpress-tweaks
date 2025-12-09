@@ -4,3 +4,11 @@ dist/*
 !dist/extracted/
 dist/archives/*
 dist/extracted/*
+.idea/
+
+# Composer dependencies (install with: composer install)
+vendor/
+composer.lock
+
+# PHPCS cache
+.phpcs.xml.cache
