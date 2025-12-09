@@ -16,11 +16,16 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Include the main plugin class
+// Include plugin classes
 require_once plugin_dir_path(__FILE__) . 'includes/EmboldWordpressTweaks.php';
+require_once plugin_dir_path(__FILE__) . 'includes/Utilities/Environment.php';
+require_once plugin_dir_path(__FILE__) . 'includes/Services/DisableMailService.php';
+require_once plugin_dir_path(__FILE__) . 'includes/Admin/SettingsPage.php';
 
 require 'plugin-update-checker/plugin-update-checker.php';
 
+use App\Admin\SettingsPage;
+use App\Services\DisableMailService;
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $embold_update_checker = PucFactory::buildUpdateChecker(
@@ -35,10 +40,11 @@ $embold_update_checker->getVcsApi()->enableReleaseAssets();
 // Plugin initialization
 function embold_wordpress_tweaks_init()
 {
-    // Create an instance of your plugin class
+    // Create an instance of the plugin class
     $plugin = new \App\EmboldWordpressTweaks();
 
-    if (is_admin() && !defined('LOOSE_USER_RESTRICTIONS') || (defined('LOOSE_USER_RESTRICTIONS') && LOOSE_USER_RESTRICTIONS == false)) {
+    // Apply user restrictions unless explicitly disabled
+    if (is_admin() && !embold_tweaks_should_disable_restrictions()) {
         // Allow specific users to edit files
         $plugin->allowSpecificUsersToEditFiles();
     }
@@ -59,46 +65,38 @@ function embold_wordpress_tweaks_init()
 
     $plugin->removeHowdy();
 
-    $environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
+    // Register mail control service
+    $mailService = new DisableMailService();
+    $mailService->register();
 
-    if (!defined('DISABLE_MAIL') || DISABLE_MAIL !== false) {
-        if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
-            // Disable an array of mail plugins
-            $plugin->disableAllKnownMailPlugins();
-        }
+    // Settings page (admin only)
+    if (is_admin()) {
+        $settings = new SettingsPage();
+        $settings->register();
     }
+}
+
+/**
+ * Determine if user restrictions should be disabled
+ * Checks constant first, then option, defaults to false (restrictions enabled)
+ *
+ * @return bool True if restrictions should be disabled
+ */
+function embold_tweaks_should_disable_restrictions()
+{
+    // Constant takes priority
+    if (defined('LOOSE_USER_RESTRICTIONS')) {
+        return (bool) constant('LOOSE_USER_RESTRICTIONS');
+    }
+
+    // Plugin option
+    $opts = get_option('embold_tweaks_options', []);
+    if (isset($opts['loose_user_restrictions'])) {
+        return (bool) $opts['loose_user_restrictions'];
+    }
+
+    // Default: restrictions are enabled (return false)
+    return false;
 }
 
 add_action('plugins_loaded', 'embold_wordpress_tweaks_init', 0);
-
-/**
- * Determine if mail blocking should be handled by this plugin.
- * Skip if wphaven-connect is active (it handles mail management).
- */
-function embold_should_handle_mail(): bool
-{
-    // If wphaven-connect is active, let it handle mail management
-    if (class_exists('WPHavenConnect\Providers\DisableMailServiceProvider')) {
-        return false;
-    }
-
-    return true;
-}
-
-// This function must be global, if we put it in our class it won't override the core function
-// Only disable mail if wphaven-connect isn't handling it
-if (embold_should_handle_mail()) {
-    $environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
-
-    // Block mail in non-production environments unless DISABLE_MAIL is explicitly set to false
-    if (!defined('DISABLE_MAIL') || DISABLE_MAIL !== false) {
-        if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
-            if (!function_exists('wp_mail')) {
-                function wp_mail()
-                {
-                    return false;
-                }
-            }
-        }
-    }
-}
