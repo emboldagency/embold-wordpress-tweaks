@@ -22,38 +22,40 @@ email sent out from local.
 
 ## Configuration
 
-## To send email on staging/local
-
-Define the 'DISABLE_MAIL' as false in your wp-config.php
+## Disable mail on staging/local
 
 ```php
 define('DISABLE_MAIL', true);
 ```
 
-## Requirements
+## Strict Requirements
 
-Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php
+1) Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php
 
 ```php
 define('WP_ENVIRONMENT_TYPE', 'development');
 ```
 
-2. Make sure that our user account for the site is set to info@embold.com or info@wphaven.app
+2) Make sure that our user account for the site is set to info@embold.com or info@wphaven.app
 
 ## Disable User Account Restrictions
 
-Define 'LOOSE_USER_RESTRICTIONS' in the wp-config and set it to true, this will disable all of our theme, plugin, and
-file protections put in place by the plugin.
+```php
+define('LOOSE_USER_RESTRICTIONS', true);
+```
+
+This will disable all of our theme, plugin, and file protections put in place by the plugin. This allows any user to make dangerous changes.
 
 ## Additional Elevated User Accounts
 
 Define the 'ELEVATED_EMAILS' as an array in your local wp-config.php - these account emails will be able to manage plugins
 and themes, but they will still be disabled from editing php files directly.
 
-`define('ELEVATED_EMAILS', ['worf@embold.com', 'spock@embold.com']);`
+```php
+define('ELEVATED_EMAILS', ['worf@embold.com', 'spock@embold.com']);
+```
 
-This only needs set on production if we don't have an info@embold.com or info@wphaven.app account there. Then this should be set on production to
-whatever our admin email is.
+**This only needs set on production if we don't have an info@embold.com or info@wphaven.app account there or if the client requests permissions.**
 
 ## Enable local Mailgun
 
@@ -68,6 +70,17 @@ The plugin supports several environment-specific constants:
 - `DISABLE_MAIL`: Control email functionality (true to disable)
 - `LOOSE_USER_RESTRICTIONS`: Disable theme, plugin, and file protections
 - `ELEVATED_EMAILS`: Array of additional admin emails
+
+## Installation through Git
+
+From the wp-content/plugins directory:
+
+```bash
+git clone git@github.com:emboldagency/embold-wordpress-tweaks.git && \
+cd embold-wordpress-tweaks && \
+while IFS= read -r p; do [[ -z "$p" || "$p" =~ ^# ]] && continue; rm -rf $p 2>/dev/null; done < .distignore && \
+wp plugin activate embold-wordpress-tweaks
+```
 
 
 ## Development Setup
