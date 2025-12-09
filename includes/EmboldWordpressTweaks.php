@@ -2,6 +2,8 @@
 
 namespace App;
 
+use PHPMailer\PHPMailer\PHPMailer;
+
 class EmboldWordpressTweaks
 {
     public function allowSpecificUsersToEditFiles()
@@ -296,5 +298,81 @@ class EmboldWordpressTweaks
                 ]);
             }
         }, 25);
+    }
+    /**
+     * Configure Mail Behavior (Block / SMTP Override)
+     */
+    public function configureMailBehavior()
+    {
+        // Resolve Mode
+        // We replicate the resolver logic here to keep it self-contained in the main class
+        // or check if we can reuse the SettingsPage static helper if accessible.
+        // For simplicity, let's implement the resolver logic directly here.
+        $mode = 'auto';
+        $locked_by = null;
+
+        // Constants
+        if (defined('DISABLE_MAIL') && constant('DISABLE_MAIL')) {
+            $mode = 'block_all';
+        } else {
+            $opts = get_option(self::OPTION_NAME, []);
+            $mode = $opts['mail_mode'] ?? 'auto';
+        }
+
+        // Auto Logic
+        if ($mode === 'auto') {
+            $env = function_exists('wp_get_environment_type') ? wp_get_environment_type() : 'production';
+            if ($env === 'local')
+                $mode = 'smtp_override';
+            elseif (in_array($env, ['development', 'staging'], true))
+                $mode = 'block_all';
+            else
+                $mode = 'no_override';
+        }
+
+        // Handle Modes
+        switch ($mode) {
+            case 'block_all':
+                add_filter('pre_wp_mail', function ($result, $args = []) {
+                    $error = new \WP_Error('embold_mail_blocked', 'Mail sending is blocked by Embold Tweaks.');
+                    do_action('wp_mail_failed', $error);
+                    return false;
+                }, 9999, 2);
+                break;
+
+            case 'smtp_override':
+                // Override From Addresses
+                add_filter('wp_mail_from', function () {
+                    return $this->getOption('smtp_from_email', 'admin@wordpress.local');
+                }, 9999);
+                add_filter('wp_mail_from_name', function () {
+                    return $this->getOption('smtp_from_name', 'WordPress');
+                }, 9999);
+
+                // Configure PHPMailer
+                add_action('phpmailer_init', function (PHPMailer $phpmailer) {
+                    $phpmailer->isSMTP();
+                    $phpmailer->Host = $this->getOption('smtp_host', 'mailpit');
+                    $phpmailer->Port = (int) $this->getOption('smtp_port', 1025);
+                    $phpmailer->SMTPAuth = false;
+                    $phpmailer->SMTPSecure = '';
+                }, 9999);
+
+                // Disable conflicting plugins
+                $this->disableConflictingMailPlugins();
+                break;
+        }
+    }
+
+    private function disableConflictingMailPlugins()
+    {
+        if (!is_admin())
+            return;
+
+        $plugins = ['mailgun/mailgun.php', 'sparkpost/sparkpost.php', 'wp-mail-smtp/wp_mail_smtp.php', 'easy-wp-smtp/easy-wp-smtp.php'];
+        $active = array_filter($plugins, 'is_plugin_active');
+        if (!empty($active)) {
+            deactivate_plugins($active);
+        }
     }
 }

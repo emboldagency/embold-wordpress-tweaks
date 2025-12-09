@@ -71,16 +71,33 @@ function embold_wordpress_tweaks_init()
 
 add_action('plugins_loaded', 'embold_wordpress_tweaks_init', 0);
 
-$environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
+/**
+ * Determine if mail blocking should be handled by this plugin.
+ * Skip if wphaven-connect is active (it handles mail management).
+ */
+function embold_should_handle_mail(): bool
+{
+    // If wphaven-connect is active, let it handle mail management
+    if (class_exists('WPHavenConnect\Providers\DisableMailServiceProvider')) {
+        return false;
+    }
+
+    return true;
+}
 
 // This function must be global, if we put it in our class it won't override the core function
-if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
-    // if DISABLE_MAIL is not set to false in the wp-config
+// Only disable mail if wphaven-connect isn't handling it
+if (embold_should_handle_mail()) {
+    $environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
+
+    // Block mail in non-production environments unless DISABLE_MAIL is explicitly set to false
     if (!defined('DISABLE_MAIL') || DISABLE_MAIL !== false) {
-        if (!function_exists('wp_mail')) {
-            function wp_mail()
-            {
-                return false;
+        if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
+            if (!function_exists('wp_mail')) {
+                function wp_mail()
+                {
+                    return false;
+                }
             }
         }
     }
