@@ -58,28 +58,6 @@ class SettingsPage
         );
     }
 
-    public function handleReset(): void
-    {
-        if (isset($_POST['embold_reset_settings'])) {
-            if (!current_user_can('manage_options')) {
-                return;
-            }
-
-            if (!check_admin_referer('embold_reset_settings_action', 'embold_reset_nonce')) {
-                return;
-            }
-
-            delete_option(self::OPTION_NAME);
-
-            add_settings_error(
-                self::OPTION_NAME,
-                'embold_reset',
-                __('Settings reset to defaults.', 'embold-wordpress-tweaks'),
-                'updated'
-            );
-        }
-    }
-
     public function handleSendTestEmail()
     {
         if (!current_user_can('manage_options')) {
@@ -116,6 +94,38 @@ class SettingsPage
 
         wp_safe_redirect($redirect);
         exit;
+    }
+
+    public function handleReset(): void
+    {
+        if (isset($_POST['embold_reset_settings'])) {
+            if (!current_user_can('manage_options')) {
+                return;
+            }
+
+            if (!check_admin_referer('embold_reset_settings_action', 'embold_reset_nonce')) {
+                return;
+            }
+
+            delete_option(self::OPTION_NAME);
+
+            add_settings_error(
+                self::OPTION_NAME,
+                'embold_reset',
+                __('Settings reset to defaults.', 'embold-wordpress-tweaks'),
+                'updated'
+            );
+
+            // Schedule cleanup of the notice after this request
+            add_action('shutdown', function () {
+                global $wp_settings_errors;
+                if (isset($wp_settings_errors)) {
+                    $wp_settings_errors = array_filter($wp_settings_errors, function ($error) {
+                        return $error['setting'] !== self::OPTION_NAME || $error['code'] !== 'embold_reset';
+                    });
+                }
+            });
+        }
     }
 
     public function addSettingsPage(): void
@@ -556,7 +566,16 @@ class SettingsPage
                 </div>
             <?php endif; ?>
 
-            <?php settings_errors(self::OPTION_NAME); ?>
+            <?php 
+            settings_errors(self::OPTION_NAME);
+            // Clear the notice queue after rendering so it doesn't persist on reload
+            add_action('shutdown', function () {
+                global $wp_settings_errors;
+                if (isset($wp_settings_errors)) {
+                    $wp_settings_errors = [];
+                }
+            });
+            ?>
 
             <form method="post" action="options.php">
                 <?php
