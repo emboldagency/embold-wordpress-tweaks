@@ -37,6 +37,9 @@ $embold_update_checker = PucFactory::buildUpdateChecker(
 // Set authentication and enable release assets
 $embold_update_checker->getVcsApi()->enableReleaseAssets();
 
+// Register deactivation hook
+register_deactivation_hook(__FILE__, '\App\EmboldWordpressTweaks::onDeactivation');
+
 // Plugin initialization
 function embold_wordpress_tweaks_init()
 {
@@ -64,6 +67,9 @@ function embold_wordpress_tweaks_init()
     $plugin->disableEscapingAcfShortcodes();
 
     $plugin->removeHowdy();
+
+    // Notice Suppression
+    $plugin->enableNoticeSuppression();
 
     // Register mail control service
     $mailService = new DisableMailService();

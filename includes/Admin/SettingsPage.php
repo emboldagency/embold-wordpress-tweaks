@@ -277,6 +277,7 @@ class SettingsPage
             'embold_tweaks_general',
             [
                 'key' => 'suppress_notice_extra_strings',
+                'const' => 'EMBOLD_SUPPRESS_LOGS_EXTRA',
                 'desc' => __('Add additional partial strings to suppress from <code>_doing_it_wrong</code> notices, one per line.', 'embold-wordpress-tweaks'),
                 'row_class' => 'embold-suppress-strings-row' // Helper class for JS target
             ]
@@ -480,12 +481,31 @@ class SettingsPage
     public function renderTextareaField($args): void
     {
         $key = $args['key'];
+        $const = $args['const'] ?? null;
         $desc = $args['desc'] ?? '';
         $row_class = $args['row_class'] ?? '';
 
         $opts = $this->getOptions();
-        $value = $opts[$key] ?? '';
+
+        // Determine if locked by constant
+        $is_locked = false;
+        $locked_const_name = null;
+        if ($const && defined($const)) {
+            $is_locked = true;
+            $locked_const_name = $const;
+            $const_val = constant($const);
+            // Support both array and string formats
+            if (is_array($const_val)) {
+                $value = implode("\n", $const_val);
+            } else {
+                $value = (string) $const_val;
+            }
+        } else {
+            $value = $opts[$key] ?? '';
+        }
+
         $name = self::OPTION_NAME . "[$key]";
+        $readonly_attr = $is_locked ? 'readonly' : '';
 
         // Hacky way to add a class to the TR via the field callback output? 
         // WP doesn't let us easily add class to the TR from add_settings_field.
@@ -495,13 +515,18 @@ class SettingsPage
         }
 
         echo sprintf(
-            '<textarea name="%s" rows="3" class="large-text">%s</textarea>',
+            '<textarea name="%s" rows="3" class="large-text" %s>%s</textarea>',
             esc_attr($name),
+            $readonly_attr,
             esc_textarea($value)
         );
 
         if ($desc) {
             echo '<p class="description">' . wp_kses_post($desc) . '</p>';
+        }
+
+        if ($is_locked && $locked_const_name) {
+            echo $this->getConstantOverrideHtml($locked_const_name);
         }
 
         if ($row_class) {
@@ -820,9 +845,11 @@ class SettingsPage
             $output[$key] = isset($input[$key]);
         }
 
-        // Textarea: Suppress Extra Strings
-        if (isset($input['suppress_notice_extra_strings'])) {
-            $output['suppress_notice_extra_strings'] = sanitize_textarea_field($input['suppress_notice_extra_strings']);
+        // Textarea: Suppress Extra Strings (only if not locked by constant)
+        if (!defined('EMBOLD_SUPPRESS_LOGS_EXTRA')) {
+            if (isset($input['suppress_notice_extra_strings'])) {
+                $output['suppress_notice_extra_strings'] = sanitize_textarea_field($input['suppress_notice_extra_strings']);
+            }
         }
 
         // --- Mail Mode ---

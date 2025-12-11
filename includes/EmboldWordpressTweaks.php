@@ -42,6 +42,18 @@ class EmboldWordpressTweaks
 
     private function getOption(string $key, $default = '')
     {
+        // Priority: EMBOLD_SUPPRESS_LOGS_EXTRA (constant) -> option -> default
+        if ($key === 'suppress_notice_extra_strings') {
+            if (defined('EMBOLD_SUPPRESS_LOGS_EXTRA')) {
+                $const_val = constant('EMBOLD_SUPPRESS_LOGS_EXTRA');
+                // Support both array and string formats
+                if (is_array($const_val)) {
+                    return implode("\n", $const_val);
+                }
+                return (string) $const_val;
+            }
+        }
+
         $opts = get_option(self::OPTION_NAME, []);
         return $opts[$key] ?? $default;
     }
@@ -393,6 +405,153 @@ class EmboldWordpressTweaks
             }
         }, 25);
     }
+
+    /**
+     * Manage the MU-plugin for notice suppression.
+     * Ensures early loading to catch _doing_it_wrong notices.
+     */
+    public function enableNoticeSuppression()
+    {
+        $mu_path = WPMU_PLUGIN_DIR . '/00-suppress-logs.php';
+        $legacy_wphaven_path = WPMU_PLUGIN_DIR . '/00-suppress-textdomain-notices.php';
+        $should_be_active = $this->resolveSuppressLogsConstant();
+
+        // Only manage the file in the admin to avoid disk I/O on every frontend request
+        // Unless it's a dev environment where we might be toggling things
+        if (!is_admin() && !defined('WP_CLI')) {
+            return;
+        }
+
+        // Cleanup legacy MU-plugin files
+        if (file_exists($legacy_wphaven_path)) {
+            @unlink($legacy_wphaven_path);
+        }
+
+        if ($should_be_active) {
+            // If the file doesn't exist, create it
+            // We can also check modification time or version if we update the logic often,
+            // but for now, existence check is sufficient.
+            if (!file_exists($mu_path)) {
+                $this->createMuPlugin($mu_path);
+            }
+        } else {
+            // If feature is disabled, cleanup the MU plugin
+            $this->removeMuPlugin();
+        }
+
+        // Fallback: If writing to MU failed (permissions), apply late filters anyway
+        if ($should_be_active && !file_exists($mu_path)) {
+            $this->applyLateNoticeSuppression();
+        }
+    }
+
+    /**
+     * Resolve suppress logs constant with backwards compatibility.
+     * Priority: EMBOLD_SUPPRESS_LOGS (new) -> WPH_SUPPRESS_TEXTDOMAIN_NOTICES (legacy) -> option -> default (true)
+     */
+    private function resolveSuppressLogsConstant(): bool
+    {
+        // 1. Check new constant first
+        if (defined('EMBOLD_SUPPRESS_LOGS')) {
+            return (bool) constant('EMBOLD_SUPPRESS_LOGS');
+        }
+
+        // 2. Fall back to legacy constant for backwards compatibility
+        if (defined('WPH_SUPPRESS_TEXTDOMAIN_NOTICES')) {
+            return (bool) constant('WPH_SUPPRESS_TEXTDOMAIN_NOTICES');
+        }
+
+        // 3. Check database option
+        return $this->isFeatureEnabled('suppress_notices');
+    }
+
+    /**
+     * Handle plugin deactivation
+     * Cleans up the MU-plugin file when plugin is deactivated
+     */
+    public static function onDeactivation()
+    {
+        $mu_path = WPMU_PLUGIN_DIR . '/00-suppress-logs.php';
+        
+        if (file_exists($mu_path)) {
+            if (@unlink($mu_path)) {
+                error_log('[Embold] MU-plugin cleaned up');
+            } else {
+                error_log('[Embold] Failed to delete MU-plugin: ' . $mu_path);
+            }
+        }
+    }
+
+    /**
+     * Removes the MU-plugin file if it exists.
+     */
+    private function removeMuPlugin()
+    {
+        $mu_path = WPMU_PLUGIN_DIR . '/00-suppress-logs.php';
+        if (file_exists($mu_path)) {
+            @unlink($mu_path);
+        }
+    }
+
+    private function createMuPlugin($path)
+    {
+        // Ensure directory exists
+        if (!is_dir(dirname($path))) {
+            if (!mkdir(dirname($path), 0755, true)) {
+                error_log('[Embold] Failed to create mu-plugins directory: ' . dirname($path));
+                return;
+            }
+        }
+
+        // Resolve source path using plugin_dir_path for proper plugin-relative path
+        $source = plugin_dir_path(dirname(__FILE__)) . 'templates/00-suppress-logs.php';
+
+        if (!file_exists($source)) {
+            error_log('[Embold] MU-Plugin Template missing at: ' . $source);
+            return;
+        }
+
+        if (!copy($source, $path)) {
+            error_log('[Embold] Failed to copy MU-Plugin to: ' . $path);
+        }
+    }
+
+    /**
+     * Fallback method if MU plugin cannot be written.
+     */
+    private function applyLateNoticeSuppression()
+    {
+        $strings_to_check = [
+            '_load_textdomain_just_in_time',
+            'Translation loading',
+            'automatic_feed_links',
+            'wp_deregister_script',
+            'wp_register_script',
+            'wp_enqueue_script',
+            'Scripts and styles should not be registered or enqueued until the',
+        ];
+
+        // Add custom strings
+        $extra = $this->getOption('suppress_notice_extra_strings');
+        if (!empty($extra)) {
+            $custom_strings = preg_split('/[\r\n]+/', $extra);
+            if (is_array($custom_strings)) {
+                $strings_to_check = array_merge($strings_to_check, array_filter(array_map('trim', $custom_strings)));
+            }
+        }
+
+        add_filter('doing_it_wrong_trigger_error', function ($trigger, $function_name, $message, $version) use ($strings_to_check) {
+            foreach ($strings_to_check as $s) {
+                if (empty($s))
+                    continue;
+                if ($function_name === $s || strpos($message, $s) !== false) {
+                    return false;
+                }
+            }
+            return $trigger;
+        }, 10, 4);
+    }
+
     /**
      * Configure Mail Behavior (Block / SMTP Override)
      */
