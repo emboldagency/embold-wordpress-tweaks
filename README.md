@@ -12,55 +12,79 @@ WordPress plugin that provides common tweaks and changes we normally have to mak
 1. Allow SVG uploads in the admin panel.
 2. Local only: Defer and async various Gutenberg scripts to avoid Coders 502 errors.
 3. Local only: Disable all "wp_mail" functions so Mailgun can't randomly mass email users. This will also break the test
-email sent out from local.
+   email sent out from local.
 4. Disable the XML-RPC functionality.
 5. Remove line breaks from img tags if litespeed cache plugin is active.
 6. Allow searching for posts/pages by slug in the admin panel using the prefix 'slug:' before the search term.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
-9. Changes the admin login URL to the value of 'EMBOLD_ADMIN_URL', if set.
 
 ## Configuration
 
-## Disable mail on staging/local
+### Environment Type
 
-```php
-define('DISABLE_MAIL', true);
-```
-
-## Strict Requirements
-
-1) Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php
+Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php:
 
 ```php
 define('WP_ENVIRONMENT_TYPE', 'development');
 ```
 
-2) Make sure that our user account for the site is set to info@embold.com or info@wphaven.app
+### Email Control
 
-## Disable User Account Restrictions
+To enable email sending, define the 'DISABLE_MAIL' constant as false in your wp-config.php (disabled by default in non-prod environments):
+
+```php
+define('DISABLE_MAIL', false);
+```
+
+**Note:** Make sure that our user account for the site is set to info@embold.com or info@wphaven.app
+
+### Disable User Account Restrictions
+
+Define 'LOOSE_USER_RESTRICTIONS' in the wp-config and set it to true. This will disable all theme, plugin, and file protections put in place by the plugin:
 
 ```php
 define('LOOSE_USER_RESTRICTIONS', true);
 ```
 
-This will disable all of our theme, plugin, and file protections put in place by the plugin. This allows any user to make dangerous changes.
+### Additional Elevated User Accounts
 
-## Additional Elevated User Accounts
-
-Define the 'ELEVATED_EMAILS' as an array in your local wp-config.php - these account emails will be able to manage plugins
-and themes, but they will still be disabled from editing php files directly.
+Define the 'ELEVATED_EMAILS' as an array in your wp-config.php. These account emails will be able to manage plugins and themes, but they will still be disabled from editing PHP files directly:
 
 ```php
 define('ELEVATED_EMAILS', ['worf@embold.com', 'spock@embold.com']);
 ```
 
+
 **This only needs set on production if we don't have an info@embold.com or info@wphaven.app account there or if the client requests permissions.**
 
-## Enable local Mailgun
+### Notice Suppression
 
-Comment out or change the 'WP_ENVIRONMENT_TYPE' to not be 'development'. This will let you send emails from local including
-the test email.
+To control debug notice suppression, define the 'EMBOLD_SUPPRESS_LOGS' constant:
+
+```php
+define('EMBOLD_SUPPRESS_LOGS', false); // Set to false to disable suppression
+```
+
+The legacy `WPH_SUPPRESS_TEXTDOMAIN_NOTICES` constant is deprecated but will still work for backwards compatibility.
+
+To customize the notices that are suppressed, use the `EMBOLD_SUPPRESS_LOGS_EXTRA` constant:
+
+```php
+define('EMBOLD_SUPPRESS_LOGS_EXTRA', [
+    'register_sidebar',
+    'another notice string to suppress',
+]);
+```
+
+### Feature Toggles
+
+Individual features can be controlled via constants:
+
+```php
+define('EMBOLD_ALLOW_SVG', false);      // Disable SVG uploads
+define('EMBOLD_DISABLE_XMLRPC', false); // Re-enable XML-RPC
+```
 
 ## Environment Constants
 
@@ -81,7 +105,6 @@ cd embold-wordpress-tweaks && \
 while IFS= read -r p; do [[ -z "$p" || "$p" =~ ^# ]] && continue; rm -rf $p 2>/dev/null; done < .distignore && \
 wp plugin activate embold-wordpress-tweaks
 ```
-
 
 ## Development Setup
 
@@ -123,25 +146,27 @@ docker compose exec cli wp package install <package-name>
 To build the plugin for distribution (excluding development files):
 
 1. Ensure the CLI container is running:
+
    ```bash
    docker compose up cli -d
    ```
 
 2. Build the plugin to the dist directory:
+
    ```bash
    # Option 1: Use the build script (recommended)
    ./scripts/build.sh
-   
+
    # Option 2: Manual steps
    # Create distribution archive and extract to dist/
    docker compose exec cli sh -c "cd /var/www/html/wp-content/plugins/embold-wordpress-tweaks && wp dist-archive . /tmp/ --format=zip"
-   
+
    # Set up directory structure
    mkdir -p dist/archives dist/extracted
-   
+
    # Copy versioned archive (replace ${VERSION} with actual version)
    docker cp embold-wordpress-tweaks-cli-1:/tmp/embold-wordpress-tweaks.${VERSION}.zip ./dist/archives/embold-wordpress-tweaks.${VERSION}.zip
-   
+
    # Extract to dist/extracted/
    cd dist/extracted && unzip -q ../archives/embold-wordpress-tweaks.${VERSION}.zip && cd ../..
    ```
@@ -166,11 +191,13 @@ The project includes the `wp dist-archive` command for creating clean distributi
 #### Creating an Archive
 
 1. Ensure the containers are running:
+
    ```bash
    docker compose up -d
    ```
 
 2. Create a distribution archive:
+
    ```bash
    # Navigate to the plugin directory and create archive
    docker compose exec cli sh -c "cd /var/www/html/wp-content/plugins/embold-wordpress-tweaks && wp dist-archive . /tmp/ --format=zip"
@@ -186,6 +213,7 @@ The zip format is used as it's the standard format for WordPress plugin installa
 ### What Gets Excluded
 
 The `.distignore` file excludes development files such as:
+
 - `.git/` directory and Git files
 - `node_modules/` and package management files
 - Testing and build configuration files
