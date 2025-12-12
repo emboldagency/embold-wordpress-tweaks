@@ -5,7 +5,7 @@
  * Plugin Name:        emBold Wordpress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            1.5.0
+ * Version:            1.6.0
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -16,11 +16,16 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Include the main plugin class
+// Include plugin classes
 require_once plugin_dir_path(__FILE__) . 'includes/EmboldWordpressTweaks.php';
+require_once plugin_dir_path(__FILE__) . 'includes/Utilities/Environment.php';
+require_once plugin_dir_path(__FILE__) . 'includes/Services/DisableMailService.php';
+require_once plugin_dir_path(__FILE__) . 'includes/Admin/SettingsPage.php';
 
 require 'plugin-update-checker/plugin-update-checker.php';
 
+use App\Admin\SettingsPage;
+use App\Services\DisableMailService;
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $embold_update_checker = PucFactory::buildUpdateChecker(
@@ -32,13 +37,17 @@ $embold_update_checker = PucFactory::buildUpdateChecker(
 // Set authentication and enable release assets
 $embold_update_checker->getVcsApi()->enableReleaseAssets();
 
+// Register deactivation hook
+register_deactivation_hook(__FILE__, '\App\EmboldWordpressTweaks::onDeactivation');
+
 // Plugin initialization
 function embold_wordpress_tweaks_init()
 {
-    // Create an instance of your plugin class
+    // Create an instance of the plugin class
     $plugin = new \App\EmboldWordpressTweaks();
 
-    if (is_admin() && !defined('LOOSE_USER_RESTRICTIONS') || (defined('LOOSE_USER_RESTRICTIONS') && LOOSE_USER_RESTRICTIONS == false)) {
+    // Apply user restrictions unless explicitly disabled
+    if (is_admin() && !embold_tweaks_should_disable_restrictions()) {
         // Allow specific users to edit files
         $plugin->allowSpecificUsersToEditFiles();
     }
@@ -59,29 +68,41 @@ function embold_wordpress_tweaks_init()
 
     $plugin->removeHowdy();
 
-    $environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
+    // Notice Suppression
+    $plugin->enableNoticeSuppression();
 
-    if (!defined('DISABLE_MAIL') || DISABLE_MAIL !== false) {
-        if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
-            // Disable an array of mail plugins
-            $plugin->disableAllKnownMailPlugins();
-        }
+    // Register mail control service
+    $mailService = new DisableMailService();
+    $mailService->register();
+
+    // Settings page (admin only)
+    if (is_admin()) {
+        $settings = new SettingsPage();
+        $settings->register();
     }
+}
+
+/**
+ * Determine if user restrictions should be disabled
+ * Checks constant first, then option, defaults to false (restrictions enabled)
+ *
+ * @return bool True if restrictions should be disabled
+ */
+function embold_tweaks_should_disable_restrictions()
+{
+    // Constant takes priority
+    if (defined('LOOSE_USER_RESTRICTIONS')) {
+        return (bool) constant('LOOSE_USER_RESTRICTIONS');
+    }
+
+    // Plugin option
+    $opts = get_option('embold_tweaks_options', []);
+    if (isset($opts['loose_user_restrictions'])) {
+        return (bool) $opts['loose_user_restrictions'];
+    }
+
+    // Default: restrictions are enabled (return false)
+    return false;
 }
 
 add_action('plugins_loaded', 'embold_wordpress_tweaks_init', 0);
-
-$environmentsToDisableMail = ['development', 'staging', 'local', 'maintenance'];
-
-// This function must be global, if we put it in our class it won't override the core function
-if (in_array(wp_get_environment_type(), $environmentsToDisableMail)) {
-    // if DISABLE_MAIL is not set to false in the wp-config
-    if (!defined('DISABLE_MAIL') || DISABLE_MAIL !== false) {
-        if (!function_exists('wp_mail')) {
-            function wp_mail()
-            {
-                return false;
-            }
-        }
-    }
-}

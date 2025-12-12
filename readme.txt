@@ -1,9 +1,9 @@
 === emBold Wordpress Tweaks ===
-Contributors: itsjsutxan
+Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
-Tested up to: 6.3.1
-Stable tag: 1.5.0
+Tested up to: 6.9.0
+Stable tag: 1.6.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -24,19 +24,50 @@ email sent out from local.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
 
-## To send email on staging/local
+## Configuration
 
-Define the 'DISABLE_MAIL' as false in your wp-config.php
+### Environment Type
 
-`define('DISABLE_MAIL', true);`
-
-## Requirements
-
-Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php
+Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php:
 
 `define('WP_ENVIRONMENT_TYPE', 'development');`
 
+### Email Control
+
+Define the 'DISABLE_MAIL' constant as true in your wp-config.php to block all email:
+
+`define('DISABLE_MAIL', true);`
+
+### User Restrictions
+
+Disable theme, plugin, and file protections:
+
+`define('LOOSE_USER_RESTRICTIONS', true);`
+
+Add elevated admin emails:
+
+`define('ELEVATED_EMAILS', ['worf@embold.com', 'spock@embold.com']);`
+
+### Notice Suppression
+
+Control debug notice suppression:
+
+`define('EMBOLD_SUPPRESS_LOGS', false);`
+
+### Feature Toggles
+
+`define('EMBOLD_ALLOW_SVG', false);`
+`define('EMBOLD_DISABLE_XMLRPC', false);`
+
 == Changelog ==
+
+= 1.6.0 =
+* Add plugin options page with settings.
+* Implement SMTP override functionality for non-production environments with configurable host, port, from email, and from name.
+* Migrate log suppression feature from wphaven-connect including MU-plugin template for early suppression.
+* Add support for EMBOLD_SUPPRESS_LOGS_EXTRA constant for custom notice string suppression (supports array or newline-separated string format).
+* Add plugin reset tool to clear MU-plugin when plugin is deactivated.
+* Improve development workflow with updated build process and documentation.
 
 = 1.5.0 =
 * Remove EMBOLD_ADMIN_URL constant and related admin URL change feature
