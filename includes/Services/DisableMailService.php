@@ -86,8 +86,24 @@ class DisableMailService
             $phpmailer->isSMTP();
             $phpmailer->Host = $self->getOption('smtp_host', 'mailpit');
             $phpmailer->Port = (int) $self->getOption('smtp_port', 1025);
-            $phpmailer->SMTPAuth = false;
-            $phpmailer->SMTPSecure = '';
+
+            // Optional encryption: '', 'ssl', or 'tls'
+            $phpmailer->SMTPSecure = (string) $self->getOption('smtp_secure', '');
+
+            // Username/password -> enable SMTPAuth if username provided
+            $username = (string) $self->getOption('smtp_username', '');
+            $password = (string) $self->getOption('smtp_password', '');
+
+            if ($username !== '') {
+                $phpmailer->SMTPAuth = true;
+                $phpmailer->Username = $username;
+                $phpmailer->Password = $password;
+            } else {
+                $phpmailer->SMTPAuth = false;
+                // ensure no leftover credentials
+                $phpmailer->Username = '';
+                $phpmailer->Password = '';
+            }
         }, 9999);
 
         // Disable conflicting plugins
@@ -120,6 +136,9 @@ class DisableMailService
             'smtp_port' => 'EMBOLD_SMTP_PORT',
             'smtp_from_email' => 'EMBOLD_SMTP_FROM_EMAIL',
             'smtp_from_name' => 'EMBOLD_SMTP_FROM_NAME',
+            'smtp_username' => 'EMBOLD_SMTP_USERNAME',
+            'smtp_password' => 'EMBOLD_SMTP_PASSWORD',
+            'smtp_secure' => 'EMBOLD_SMTP_SECURE',
         ];
 
         // Check for constant first

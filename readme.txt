@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.6.0
+Stable tag: 1.7.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -60,6 +60,11 @@ Control debug notice suppression:
 `define('EMBOLD_DISABLE_XMLRPC', false);`
 
 == Changelog ==
+
+= 1.7.0 =
+* Add support for SMTP authentication: smtp_username and smtp_password (via plugin options or EMBOLD_SMTP_USERNAME and EMBOLD_SMTP_PASSWORD constants). Also add smtp_secure option/constant to control encryption ('' | 'ssl' | 'tls').
+* Enable SMTPAuth automatically when smtp_username is provided; preserves previous behavior (no auth) when empty.
+* Bump plugin version to 1.7.0.
 
 = 1.6.0 =
 * Add plugin options page with settings.
