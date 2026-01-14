@@ -283,7 +283,7 @@ class SettingsPage {
 				'key'          => 'suppress_notices',
 				'const'        => 'EMBOLD_SUPPRESS_LOGS',
 				'legacy_const' => 'WPH_SUPPRESS_TEXTDOMAIN_NOTICES',
-				'desc'         => __( 'Suppresses noisy <code>_doing_it_wrong</code> notices (e.g. textdomain loading) to keep logs clean.', 'embold-wordpress-tweaks' ),
+				'desc'         => __( 'Suppresses noisy <code>_doing_it_wrong</code> notices (e.g. textdomain loading) and matching PHP errors/warnings to keep debug.log clean.', 'embold-wordpress-tweaks' ),
 				'class'        => 'embold-suppress-toggle', // Helper class for JS
 			]
 		);

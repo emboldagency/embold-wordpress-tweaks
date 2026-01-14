@@ -65,6 +65,7 @@ Control debug notice suppression:
 * Add support for SMTP authentication: smtp_username and smtp_password (via plugin options or EMBOLD_SMTP_USERNAME and EMBOLD_SMTP_PASSWORD constants). Also add smtp_secure option/constant to control encryption ('' | 'ssl' | 'tls').
 * Enable SMTPAuth automatically when smtp_username is provided; preserves previous behavior (no auth) when empty.
 * Add unsaved changes warning to settings page before sending test email
+* Enhance error suppression to filter PHP errors and warnings by string
 
 = 1.6.0 =
 * Add plugin options page with settings.
