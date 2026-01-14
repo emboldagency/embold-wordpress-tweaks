@@ -66,6 +66,7 @@ Control debug notice suppression:
 * Enable SMTPAuth automatically when smtp_username is provided; preserves previous behavior (no auth) when empty.
 * Add unsaved changes warning to settings page before sending test email
 * Enhance error suppression to filter PHP errors and warnings by string
+* Auto update mu-plugin
 
 = 1.6.0 =
 * Add plugin options page with settings.

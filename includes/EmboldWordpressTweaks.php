@@ -456,10 +456,8 @@ class EmboldWordpressTweaks {
 		}
 
 		if ( $should_be_active ) {
-			// If the file doesn't exist, create it
-			// We can also check modification time or version if we update the logic often,
-			// but for now, existence check is sufficient.
-			if ( ! file_exists( $mu_path ) ) {
+			// Create or update the MU-plugin if needed
+			if ( ! file_exists( $mu_path ) || $this->shouldUpdateMuPlugin( $mu_path ) ) {
 				$this->createMuPlugin( $mu_path );
 			}
 		} else {
@@ -490,6 +488,49 @@ class EmboldWordpressTweaks {
 
 		// Check database option
 		return $this->isFeatureEnabled( 'suppress_notices' );
+	}
+
+	/**
+	 * Check if the MU-plugin needs updating by comparing versions.
+	 */
+	private function shouldUpdateMuPlugin( $mu_path ): bool {
+		if ( ! file_exists( $mu_path ) ) {
+			return true;
+		}
+
+		$source = plugin_dir_path( __DIR__ ) . 'templates/00-suppress-logs.php';
+		if ( ! file_exists( $source ) ) {
+			return false;
+		}
+
+		// Extract version from template header
+		$template_version = $this->extractPluginHeaderVersion( $source );
+		$current_version  = $this->extractPluginHeaderVersion( $mu_path );
+
+		// Update if template is newer (version_compare returns > 0 if first is greater)
+		return version_compare( $template_version, $current_version, '>' );
+	}
+
+	/**
+	 * Extract the Version line from a plugin header (first 30 lines).
+	 */
+	private function extractPluginHeaderVersion( $file_path ): string {
+		if ( ! file_exists( $file_path ) ) {
+			return '0.0.0';
+		}
+
+		$file_data = file( $file_path, FILE_IGNORE_NEW_LINES );
+		if ( ! is_array( $file_data ) ) {
+			return '0.0.0';
+		}
+
+		foreach ( array_slice( $file_data, 0, 30 ) as $line ) {
+			if ( preg_match( '/^\s*\*?\s*Version:\s*(.+?)\s*$/', $line, $matches ) ) {
+				return trim( $matches[1] );
+			}
+		}
+
+		return '0.0.0';
 	}
 
 	/**
