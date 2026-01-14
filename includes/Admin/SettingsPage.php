@@ -186,7 +186,7 @@ class SettingsPage
         add_settings_section(
             'embold_tweaks_general',
             __('General Tweaks', 'embold-wordpress-tweaks'),
-            null,
+            function () { echo '<p>' . esc_html__('General Tweaks Description', 'embold-wordpress-tweaks') . '</p>'; },
             'embold-wordpress-tweaks'
         );
 
@@ -350,6 +350,20 @@ class SettingsPage
                 'label' => __('From Name', 'embold-wordpress-tweaks'),
                 'default' => 'WordPress',
                 'const' => 'EMBOLD_SMTP_FROM_NAME'
+            ],
+            'smtp_username' => [
+                'label' => __('SMTP Username', 'embold-wordpress-tweaks'),
+                'const' => 'EMBOLD_SMTP_USERNAME'
+            ],
+            'smtp_password' => [
+                'label' => __('SMTP Password', 'embold-wordpress-tweaks'),
+                'type' => 'password',
+                'const' => 'EMBOLD_SMTP_PASSWORD'
+            ],
+            'smtp_secure' => [
+                'label' => __('Encryption', 'embold-wordpress-tweaks'),
+                'desc' => __('Leave blank for no encryption, or use <code>ssl</code> or <code>tls</code>.', 'embold-wordpress-tweaks'),
+                'const' => 'EMBOLD_SMTP_SECURE'
             ],
         ];
 
@@ -862,7 +876,7 @@ class SettingsPage
         }
 
         // --- SMTP Settings ---
-        $smtp_keys = ['smtp_host', 'smtp_from_name'];
+        $smtp_keys = ['smtp_host', 'smtp_from_name', 'smtp_username', 'smtp_password', 'smtp_secure'];
         foreach ($smtp_keys as $key) {
             if (isset($input[$key])) {
                 $output[$key] = sanitize_text_field($input[$key]);
@@ -927,6 +941,9 @@ class SettingsPage
             'smtp_port' => '1025',
             'smtp_from_email' => 'admin@wordpress.local',
             'smtp_from_name' => 'WordPress',
+            'smtp_username' => '',
+            'smtp_password' => '',
+            'smtp_secure' => false,
         ];
 
         return wp_parse_args(get_option(self::OPTION_NAME, []), $defaults);
