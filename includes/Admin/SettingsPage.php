@@ -464,6 +464,20 @@ class SettingsPage
         $placeholder = $default ? 'placeholder="' . esc_attr($default) . '"' : '';
         $readonly_attr = $is_locked ? 'readonly' : '';
 
+        // Provide sensible autocomplete attributes to satisfy browser/accessibility checks
+        $autocomplete_attr = '';
+        if (!empty($args['autocomplete'])) {
+            $autocomplete_attr = $args['autocomplete'];
+        } else {
+            if ($type === 'password') {
+                $autocomplete_attr = 'autocomplete="current-password"';
+            } elseif ($type === 'email') {
+                $autocomplete_attr = 'autocomplete="email"';
+            } elseif ($key === 'smtp_username') {
+                $autocomplete_attr = 'autocomplete="username"';
+            }
+        }
+
         $name = self::OPTION_NAME . "[$key]";
 
         if ($wrapper_class) {
@@ -471,12 +485,13 @@ class SettingsPage
         }
 
         echo sprintf(
-            '<input type="%s" name="%s" value="%s" class="regular-text" %s %s>',
+            '<input type="%s" name="%s" value="%s" class="regular-text" %s %s %s>',
             esc_attr($type),
             esc_attr($name),
             esc_attr($value),
             $placeholder,
-            $readonly_attr
+            $readonly_attr,
+            $autocomplete_attr
         );
 
         if ($desc) {
@@ -620,7 +635,8 @@ class SettingsPage
                 <?php
                 settings_fields(self::OPTION_NAME);
                 do_settings_sections('embold-wordpress-tweaks');
-                submit_button();
+                // Ensure the save button has a unique id and name to avoid duplicate #submit warnings and method shadowing
+                submit_button(null, 'primary', 'embold_save_changes', true, ['id' => 'embold-save-changes']);
                 ?>
             </form>
 
@@ -660,9 +676,12 @@ class SettingsPage
                 submit_button(
                     __('Reset to Defaults', 'embold-wordpress-tweaks'),
                     'delete',
-                    'submit',
+                    'embold_reset_settings',
                     true,
-                    ['onclick' => "return confirm('" . esc_js(__('Are you sure you want to reset all Embold WordPress Tweaks settings?', 'embold-wordpress-tweaks')) . "');"]
+                    [
+                        'id' => 'embold-reset-settings', 
+                        'onclick' => "return confirm('" . esc_js(__('Are you sure you want to reset all Embold WordPress Tweaks settings?', 'embold-wordpress-tweaks')) . "');"
+                    ]
                 );
                 ?>
             </form>

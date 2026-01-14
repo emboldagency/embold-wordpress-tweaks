@@ -70,9 +70,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!wrappers || wrappers.length === 0) return;
 
     function updateSmtpVisibility() {
-      const effective = select.dataset && select.dataset.effectiveMode
-        ? select.dataset.effectiveMode
-        : select.value || "";
+      const effective =
+        select.dataset && select.dataset.effectiveMode
+          ? select.dataset.effectiveMode
+          : select.value || "";
       const isSmtp = effective === "smtp_override";
 
       wrappers.forEach(function (wrap) {

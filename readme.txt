@@ -64,7 +64,7 @@ Control debug notice suppression:
 = 1.7.0 =
 * Add support for SMTP authentication: smtp_username and smtp_password (via plugin options or EMBOLD_SMTP_USERNAME and EMBOLD_SMTP_PASSWORD constants). Also add smtp_secure option/constant to control encryption ('' | 'ssl' | 'tls').
 * Enable SMTPAuth automatically when smtp_username is provided; preserves previous behavior (no auth) when empty.
-* Bump plugin version to 1.7.0.
+* Add unsaved changes warning to settings page before sending test email
 
 = 1.6.0 =
 * Add plugin options page with settings.
