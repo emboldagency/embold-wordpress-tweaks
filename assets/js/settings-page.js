@@ -70,9 +70,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!wrappers || wrappers.length === 0) return;
 
     function updateSmtpVisibility() {
-      const effective = select.dataset && select.dataset.effectiveMode
-        ? select.dataset.effectiveMode
-        : select.value || "";
+      const effective =
+        select.dataset && select.dataset.effectiveMode
+          ? select.dataset.effectiveMode
+          : select.value || "";
       const isSmtp = effective === "smtp_override";
 
       wrappers.forEach(function (wrap) {
@@ -95,6 +96,38 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   setupSmtpFieldsToggle();
+
+  /**
+   * Track unsaved changes and warn before sending test email
+   */
+  (function setupTestEmailWarning() {
+    const mainForm = document.querySelector('form[action="options.php"]');
+    const testForm = document.querySelector('form[action*="admin-post.php"]');
+    
+    if (!mainForm || !testForm) return;
+    
+    let hasUnsavedChanges = false;
+    
+    // Track changes in main settings form
+    mainForm.addEventListener('change', function() {
+      hasUnsavedChanges = true;
+    });
+    
+    // Reset flag when main form is saved
+    mainForm.addEventListener('submit', function() {
+      hasUnsavedChanges = false;
+    });
+    
+    // Check before sending test email
+    testForm.addEventListener('submit', function(e) {
+      if (hasUnsavedChanges) {
+        const msg = 'You have unsaved changes. The test email will use the currently saved settings, not your changes.\n\nSave settings first, or click OK to send test email with current saved settings.';
+        if (!confirm(msg)) {
+          e.preventDefault();
+        }
+      }
+    });
+  })();
 
   /**
    * Deduplicate identical notices (sometimes added twice on reset).

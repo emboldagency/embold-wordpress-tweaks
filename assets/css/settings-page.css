@@ -11,3 +11,53 @@
   font-size: 13px;
   line-height: 2;
 }
+
+/* Modal styles for test email warning */
+
+#embold-test-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 9999;
+}
+
+#embold-test-modal .embold-modal-inner {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#embold-test-modal h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+#embold-test-modal p {
+  margin: 0 0 16px;
+}
+
+#embold-test-modal .embold-modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.embold-btn {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  background: #f7f7f7;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.embold-save-btn {
+  background: #0073aa;
+  color: #fff;
+  border-color: #0073aa;
+}
