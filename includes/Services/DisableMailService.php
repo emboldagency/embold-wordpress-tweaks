@@ -178,26 +178,35 @@ class DisableMailService {
 	public function resolveMailMode(): array {
 
 		// Constants
-		if ( defined( 'DISABLE_MAIL' ) ) {
+
+		// DISABLE_MAIL === true
+		if ( defined( 'DISABLE_MAIL' ) && DISABLE_MAIL ) {
 			return [
-				'mode'      => constant( 'DISABLE_MAIL' ) ? 'block_all' : 'no_override',
+				'mode'      => 'block_all',
 				'locked_by' => 'DISABLE_MAIL',
 				'source'    => 'constant',
 			];
 		}
 
-		if ( defined( 'EMBOLD_MAIL_MODE' ) ) {
-			$mode = constant( 'EMBOLD_MAIL_MODE' );
-			if ( in_array( $mode, [ 'block_all', 'smtp_override', 'allow_all', 'auto' ], true ) ) {
-				if ( $mode === 'auto' ) {
-					return $this->resolveEnvironmentDefault();
-				}
-				return [
-					'mode'      => $mode,
-					'locked_by' => 'EMBOLD_MAIL_MODE',
-					'source'    => 'constant',
-				];
-			}
+		// EMBOLD_SMTP_HOST === non-empty
+		// If SMTP host is defined, we assume the user wants to use it (smtp_override).
+		if ( defined( 'EMBOLD_SMTP_HOST' ) && ! empty( EMBOLD_SMTP_HOST ) ) {
+			return [
+				'mode'      => 'smtp_override',
+				'locked_by' => 'EMBOLD_SMTP_HOST',
+				'source'    => 'constant',
+			];
+		}
+
+		// DISABLE_MAIL === false
+		// If it was defined by this point, it must be FALSE.
+		// We return no_override so we don't fall through to options/env defaults that might block it.
+		if ( defined( 'DISABLE_MAIL' ) ) {
+			return [
+				'mode'      => 'no_override',
+				'locked_by' => 'DISABLE_MAIL',
+				'source'    => 'constant',
+			];
 		}
 
 		// Plugin option
