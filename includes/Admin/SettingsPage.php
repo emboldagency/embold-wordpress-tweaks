@@ -229,34 +229,41 @@ class SettingsPage {
 			// Admin UX
 			'enable_slug_search'   => [
 				'label' => __( 'Enable Slug Search', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_ENABLE_SLUG_SEARCH',
 				'desc'  => __( 'Allows searching by slug using the prefix <code>slug:your-slug</code>.', 'embold-wordpress-tweaks' ),
 			],
 			'enable_slug_column'   => [
 				'label' => __( 'Enable Slug Column', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_ENABLE_SLUG_COLUMN',
 				'desc'  => __( 'Adds a "Slug" column to post lists.', 'embold-wordpress-tweaks' ),
 			],
 			'remove_howdy'         => [
 				'label' => __( 'Remove "Howdy"', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_REMOVE_HOWDY',
 				'desc'  => __( 'Removes the "Howdy" text from the admin bar greeting.', 'embold-wordpress-tweaks' ),
 			],
 
 			// Stability & Performance (502 Error Prevention)
 			'defer_scripts'        => [
 				'label' => __( 'Defer Non-Critical Scripts', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DEFER_SCRIPTS',
 				'desc'  => __( 'Defers common scripts (like admin bar JS) to improve load times and prevent 502 errors on local environments.', 'embold-wordpress-tweaks' ),
 			],
 			'async_scripts'        => [
 				'label' => __( 'Async Admin Scripts', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_ASYNC_SCRIPTS',
 				'desc'  => __( 'Loads admin bar, heartbeat, and other admin scripts asynchronously.', 'embold-wordpress-tweaks' ),
 			],
 
 			// Specific Compatibility Fixes
 			'disable_acf_escaping' => [
 				'label' => __( 'Disable ACF Shortcode Escaping', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_ACF_ESCAPING',
 				'desc'  => __( 'Reverts the ACF 6.2.5 security change to allow HTML in shortcode content.', 'embold-wordpress-tweaks' ),
 			],
 			'clean_img_tags'       => [
 				'label' => __( 'LiteSpeed Image Cleanup', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_CLEAN_IMG_TAGS',
 				'desc'  => __( 'Removes line breaks from img tags to ensure compatibility with LiteSpeed Cache.', 'embold-wordpress-tweaks' ),
 			],
 		];

@@ -186,6 +186,20 @@ class DisableMailService {
 			];
 		}
 
+		if ( defined( 'EMBOLD_MAIL_MODE' ) ) {
+			$mode = constant( 'EMBOLD_MAIL_MODE' );
+			if ( in_array( $mode, [ 'block_all', 'smtp_override', 'allow_all', 'auto' ], true ) ) {
+				if ( $mode === 'auto' ) {
+					return $this->resolveEnvironmentDefault();
+				}
+				return [
+					'mode'      => $mode,
+					'locked_by' => 'EMBOLD_MAIL_MODE',
+					'source'    => 'constant',
+				];
+			}
+		}
+
 		// Plugin option
 		$opts = get_option( self::OPTION_NAME, [] );
 		if ( ! empty( $opts['mail_mode'] ) ) {

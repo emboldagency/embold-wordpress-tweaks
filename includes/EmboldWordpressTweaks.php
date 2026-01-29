@@ -186,7 +186,7 @@ class EmboldWordpressTweaks {
 	 * @return void
 	 */
 	public function deferScripts() {
-		if ( ! $this->isFeatureEnabled( 'defer_scripts' ) ) {
+		if ( ! $this->isFeatureEnabled( 'defer_scripts', 'EMBOLD_DEFER_SCRIPTS' ) ) {
 			return;
 		}
 
@@ -218,7 +218,7 @@ class EmboldWordpressTweaks {
 	 * @return void
 	 */
 	public function asyncScripts() {
-		if ( ! $this->isFeatureEnabled( 'async_scripts' ) ) {
+		if ( ! $this->isFeatureEnabled( 'async_scripts', 'EMBOLD_ASYNC_SCRIPTS' ) ) {
 			return;
 		}
 
@@ -280,7 +280,7 @@ class EmboldWordpressTweaks {
 	 * Remove line breaks from img tags if litespeed-cache is enabled
 	 */
 	public function removeLineBreaksFromImgTags() {
-		if ( ! $this->isFeatureEnabled( 'clean_img_tags' ) ) {
+		if ( ! $this->isFeatureEnabled( 'clean_img_tags', 'EMBOLD_CLEAN_IMG_TAGS' ) ) {
 			return;
 		}
 
@@ -308,7 +308,7 @@ class EmboldWordpressTweaks {
 	 */
 	public function addSlugSearchAndColumns() {
 		// Enable Slug Search
-		if ( $this->isFeatureEnabled( 'enable_slug_search' ) ) {
+		if ( $this->isFeatureEnabled( 'enable_slug_search', 'EMBOLD_ENABLE_SLUG_SEARCH' ) ) {
 			add_filter(
 				'posts_search',
 				function ( $search, \WP_Query $q ) use ( &$wpdb ) {
@@ -354,7 +354,7 @@ class EmboldWordpressTweaks {
 		}
 
 		// Enable Slug Column
-		if ( $this->isFeatureEnabled( 'enable_slug_column' ) ) {
+		if ( $this->isFeatureEnabled( 'enable_slug_column', 'EMBOLD_ENABLE_SLUG_COLUMN' ) ) {
 			$post_types = [ 'page', 'post' ];
 			foreach ( $post_types as $post_type ) {
 				add_filter(
@@ -394,7 +394,7 @@ class EmboldWordpressTweaks {
 	 * Disable escaping ACF shortcode content introduced in ACF 6.2.5
 	 */
 	public function disableEscapingAcfShortcodes() {
-		if ( ! $this->isFeatureEnabled( 'disable_acf_escaping' ) ) {
+		if ( ! $this->isFeatureEnabled( 'disable_acf_escaping', 'EMBOLD_DISABLE_ACF_ESCAPING' ) ) {
 			return;
 		}
 
@@ -411,7 +411,7 @@ class EmboldWordpressTweaks {
 	 * Remove the "Howdy" greeting from the admin bar
 	 */
 	public function removeHowdy() {
-		if ( ! $this->isFeatureEnabled( 'remove_howdy' ) ) {
+		if ( ! $this->isFeatureEnabled( 'remove_howdy', 'EMBOLD_REMOVE_HOWDY' ) ) {
 			return;
 		}
 
