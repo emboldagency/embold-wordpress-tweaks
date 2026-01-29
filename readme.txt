@@ -16,48 +16,35 @@ There are common changes we normally have to make in every generic WordPress web
 
 1. Allow SVG uploads in the admin panel.
 2. Local only: Defer and async various Gutenberg scripts to avoid Coders 502 errors.
-3. Local only: Disable all "wp_mail" functions so Mailgun can't randomly mass email users. This will also break the test
-email sent out from local.
-4. Disable XML-RPC for security reasons.
+3. Non-prod only: Disable all "wp_mail" functions by default so Mailgun can't randomly mass email users. This will also break the test
+   email sent out from local. Override SMTP settings with constants or plugin options.
+4. Disable the XML-RPC functionality.
 5. Remove line breaks from img tags if litespeed cache plugin is active.
 6. Allow searching for posts/pages by slug in the admin panel using the prefix 'slug:' before the search term.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
 
+
+## Strict requirements
+
+1. Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php
+
+```php
+define('WP_ENVIRONMENT_TYPE', 'development');
+```
+
+2. Make sure that our user account for the site is set to info@embold.com or info@wphaven.app.
+
 ## Configuration
 
-### Environment Type
+This plugin uses constants in wp-config.php to control behavior across environments.
 
-Define the 'WP_ENVIRONMENT_TYPE' as 'development', 'staging', or 'production' in the corresponding wp-config.php:
+**Mail Configuration**
+`define('DISABLE_MAIL', false);` // Enable mail
+`define('EMBOLD_SMTP_HOST', 'mailpit');` // Define SMTP host to enable override mode
 
-`define('WP_ENVIRONMENT_TYPE', 'development');`
-
-### Email Control
-
-Define the 'DISABLE_MAIL' constant as true in your wp-config.php to block all email:
-
-`define('DISABLE_MAIL', true);`
-
-### User Restrictions
-
-Disable theme, plugin, and file protections:
-
-`define('LOOSE_USER_RESTRICTIONS', true);`
-
-Add elevated admin emails:
-
-`define('ELEVATED_EMAILS', ['worf@embold.com', 'spock@embold.com']);`
-
-### Notice Suppression
-
-Control debug notice suppression:
-
-`define('EMBOLD_SUPPRESS_LOGS', false);`
-
-### Feature Toggles
-
-`define('EMBOLD_ALLOW_SVG', false);`
-`define('EMBOLD_DISABLE_XMLRPC', false);`
+**Full Documentation**
+For a complete list of all available constants (including SMTP settings, security toggles, and performance options), please refer to the [GitHub Repository](https://github.com/emboldagency/embold-wordpress-tweaks).
 
 == Changelog ==
 
@@ -67,6 +54,8 @@ Control debug notice suppression:
 * Add unsaved changes warning to settings page before sending test email
 * Enhance error suppression to filter PHP errors and warnings by string
 * Auto update mu-plugin
+* Add constant support for more settings
+* Update README.md and readme.txt plugin documentation
 
 = 1.6.0 =
 * Add plugin options page with settings.
