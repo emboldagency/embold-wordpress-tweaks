@@ -21,6 +21,7 @@ class SettingsPage {
 		add_action( 'admin_init', [ $this, 'registerSettings' ] );
 		add_action( 'admin_init', [ $this, 'handleReset' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueueAssets' ] );
+		add_action( 'admin_notices', [ $this, 'showConflictDetection' ] );
 
 		// Handle test email
 		add_action( 'admin_post_embold_send_test_email', [ $this, 'handleSendTestEmail' ] );
@@ -145,6 +146,36 @@ class SettingsPage {
 				}
 			);
 		}
+	}
+
+	/**
+	 * Show conflict detection warning if remove-xmlrpc-pingback-ping plugin is active.
+	 *
+	 * @return void
+	 */
+	public function showConflictDetection(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( ! is_plugin_active( 'remove-xmlrpc-pingback-ping/remove-xmlrpc-pingback-ping.php' ) ) {
+			return;
+		}
+
+		$options  = get_option( self::OPTION_NAME, [] );
+		$xmlrpc_disabled = ! empty( $options['disable_xmlrpc'] ) || defined( 'EMBOLD_DISABLE_XMLRPC' ) && EMBOLD_DISABLE_XMLRPC;
+
+		if ( ! $xmlrpc_disabled ) {
+			return;
+		}
+		?>
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'emBold Tweaks:', 'embold-wordpress-tweaks' ); ?></strong>
+				<?php esc_html_e('Warning: "Remove XMLRPC Pingback Ping" is active and may conflict with emBold Tweaks\'s XML-RPC disable feature. Please deactivate one of them.', 'embold-wordpress-tweaks'); ?>
+			</p>
+		</div>
+		<?php
 	}
 
 	public function addSettingsPage(): void {
