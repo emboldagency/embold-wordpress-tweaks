@@ -23,6 +23,9 @@ class SettingsPage {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueueAssets' ] );
 		add_action( 'admin_notices', [ $this, 'showConflictDetection' ] );
 
+		// Add settings link to plugin row
+		add_filter( 'plugin_action_links_embold-wordpress-tweaks/embold-wordpress-tweaks.php', [ $this, 'addSettingsLink' ] );
+
 		// Handle test email
 		add_action( 'admin_post_embold_send_test_email', [ $this, 'handleSendTestEmail' ] );
 	}
@@ -146,6 +149,18 @@ class SettingsPage {
 				}
 			);
 		}
+	}
+
+	/**
+	 * Add settings link to plugin row on plugins page.
+	 *
+	 * @param array $links The plugin action links.
+	 * @return array The modified plugin action links.
+	 */
+	public function addSettingsLink( $links ) {
+		$settings_link = '<a href="' . admin_url( 'options-general.php?page=embold-wordpress-tweaks' ) . '">' . __( 'Settings', 'embold-wordpress-tweaks' ) . '</a>';
+		array_unshift( $links, $settings_link );
+		return $links;
 	}
 
 	/**

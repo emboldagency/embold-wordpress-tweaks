@@ -51,6 +51,7 @@ For a complete list of all available constants (including SMTP settings, securit
 = 1.8.0 =
 * Enhance XML-RPC disable feature: add X-Pingback header removal and explicit pingback.ping method removal for complete security hardening
 * Add conflict detection warning for remove-xmlrpc-pingback-ping plugin (displays banner when both are enabled)
+* Add Settings link to plugin row on plugins page for easier access
 
 = 1.7.0 =
 * Add support for SMTP authentication: smtp_username and smtp_password (via plugin options or EMBOLD_SMTP_USERNAME and EMBOLD_SMTP_PASSWORD constants). Also add smtp_secure option/constant to control encryption ('' | 'ssl' | 'tls').
