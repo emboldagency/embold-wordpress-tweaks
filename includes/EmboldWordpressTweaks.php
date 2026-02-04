@@ -178,6 +178,26 @@ class EmboldWordpressTweaks {
 		}
 
 		add_filter( 'xmlrpc_enabled', '__return_false' );
+
+		// Remove X-Pingback header
+		add_filter(
+			'wp_headers',
+			function ( $headers ) {
+				if ( isset( $headers['X-Pingback'] ) ) {
+					unset( $headers['X-Pingback'] );
+				}
+				return $headers;
+			}
+		);
+
+		// Explicitly remove pingback.ping method
+		add_filter(
+			'xmlrpc_methods',
+			function ( $methods ) {
+				unset( $methods['pingback.ping'] );
+				return $methods;
+			}
+		);
 	}
 
 	/**

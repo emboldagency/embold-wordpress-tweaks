@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -47,6 +47,11 @@ This plugin uses constants in wp-config.php to control behavior across environme
 For a complete list of all available constants (including SMTP settings, security toggles, and performance options), please refer to the [GitHub Repository](https://github.com/emboldagency/embold-wordpress-tweaks).
 
 == Changelog ==
+
+= 1.8.0 =
+* Enhance XML-RPC disable feature: add X-Pingback header removal and explicit pingback.ping method removal for complete security hardening
+* Add conflict detection warning for remove-xmlrpc-pingback-ping plugin (displays banner when both are enabled)
+* Add Settings link to plugin row on plugins page for easier access
 
 = 1.7.0 =
 * Add support for SMTP authentication: smtp_username and smtp_password (via plugin options or EMBOLD_SMTP_USERNAME and EMBOLD_SMTP_PASSWORD constants). Also add smtp_secure option/constant to control encryption ('' | 'ssl' | 'tls').

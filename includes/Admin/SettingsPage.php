@@ -21,6 +21,10 @@ class SettingsPage {
 		add_action( 'admin_init', [ $this, 'registerSettings' ] );
 		add_action( 'admin_init', [ $this, 'handleReset' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueueAssets' ] );
+		add_action( 'admin_notices', [ $this, 'showConflictDetection' ] );
+
+		// Add settings link to plugin row
+		add_filter( 'plugin_action_links_embold-wordpress-tweaks/embold-wordpress-tweaks.php', [ $this, 'addSettingsLink' ] );
 
 		// Handle test email
 		add_action( 'admin_post_embold_send_test_email', [ $this, 'handleSendTestEmail' ] );
@@ -145,6 +149,48 @@ class SettingsPage {
 				}
 			);
 		}
+	}
+
+	/**
+	 * Add settings link to plugin row on plugins page.
+	 *
+	 * @param array $links The plugin action links.
+	 * @return array The modified plugin action links.
+	 */
+	public function addSettingsLink( $links ) {
+		$settings_link = '<a href="' . admin_url( 'options-general.php?page=embold-wordpress-tweaks' ) . '">' . __( 'Settings', 'embold-wordpress-tweaks' ) . '</a>';
+		array_unshift( $links, $settings_link );
+		return $links;
+	}
+
+	/**
+	 * Show conflict detection warning if remove-xmlrpc-pingback-ping plugin is active.
+	 *
+	 * @return void
+	 */
+	public function showConflictDetection(): void {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( ! is_plugin_active( 'remove-xmlrpc-pingback-ping/remove-xmlrpc-pingback-ping.php' ) ) {
+			return;
+		}
+
+		$options  = get_option( self::OPTION_NAME, [] );
+		$xmlrpc_disabled = ! empty( $options['disable_xmlrpc'] ) || defined( 'EMBOLD_DISABLE_XMLRPC' ) && EMBOLD_DISABLE_XMLRPC;
+
+		if ( ! $xmlrpc_disabled ) {
+			return;
+		}
+		?>
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'emBold Tweaks:', 'embold-wordpress-tweaks' ); ?></strong>
+				<?php esc_html_e('Warning: "Remove XMLRPC Pingback Ping" is active and may conflict with emBold Tweaks\'s XML-RPC disable feature. Please deactivate one of them.', 'embold-wordpress-tweaks'); ?>
+			</p>
+		</div>
+		<?php
 	}
 
 	public function addSettingsPage(): void {
