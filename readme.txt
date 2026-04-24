@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.8.0
+Stable tag: 1.8.1
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -47,6 +47,10 @@ This plugin uses constants in wp-config.php to control behavior across environme
 For a complete list of all available constants (including SMTP settings, security toggles, and performance options), please refer to the [GitHub Repository](https://github.com/emboldagency/embold-wordpress-tweaks).
 
 == Changelog ==
+
+= 1.8.1 =
+* Fix bug preventing ELEVATED_EMAILS field from persisting.
+* Linting fixes.
 
 = 1.8.0 =
 * Enhance XML-RPC disable feature: add X-Pingback header removal and explicit pingback.ping method removal for complete security hardening
