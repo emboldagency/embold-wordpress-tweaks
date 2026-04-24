@@ -34,7 +34,9 @@ $embold_update_checker = PucFactory::buildUpdateChecker(
 );
 
 // Set authentication and enable release assets
-$embold_update_checker->getVcsApi()->enableReleaseAssets();
+/** @var \YahnisElsts\PluginUpdateChecker\v5p4\Vcs\GitHubApi $api */
+$api = $embold_update_checker->getVcsApi();
+$api->enableReleaseAssets();
 
 // Register deactivation hook
 register_deactivation_hook( __FILE__, '\App\EmboldWordpressTweaks::onDeactivation' );

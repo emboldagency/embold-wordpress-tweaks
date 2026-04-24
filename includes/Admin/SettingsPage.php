@@ -181,7 +181,7 @@ class SettingsPage {
 		}
 
 		$options         = get_option( self::OPTION_NAME, [] );
-		$xmlrpc_disabled = ! empty( $options['disable_xmlrpc'] ) || defined( 'EMBOLD_DISABLE_XMLRPC' ) && EMBOLD_DISABLE_XMLRPC;
+		$xmlrpc_disabled = ! empty( $options['disable_xmlrpc'] ) || ( defined( 'EMBOLD_DISABLE_XMLRPC' ) && EMBOLD_DISABLE_XMLRPC );
 
 		if ( ! $xmlrpc_disabled ) {
 			return;
@@ -843,7 +843,6 @@ class SettingsPage {
 	}
 
 	public function renderLooseUserRestrictionsField(): void {
-		$opts       = $this->getOptions();
 		$name       = self::OPTION_NAME . '[loose_user_restrictions]';
 		$resolution = $this->resolveUserRestrictions();
 
@@ -1001,7 +1000,7 @@ class SettingsPage {
 			}
 		}
 		if ( isset( $input['smtp_port'] ) ) {
-			$output['smtp_port'] = absint( $input['smtp_port'] );
+			$output['smtp_port'] = absint( $input['smtp_port'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		}
 		if ( isset( $input['smtp_from_email'] ) ) {
 			$output['smtp_from_email'] = sanitize_email( $input['smtp_from_email'] );
