@@ -12,3 +12,7 @@ composer.lock
 
 # PHPCS cache
 .phpcs.xml.cache
+
+# IDE files
+.claude
+.vscode/settings.json
