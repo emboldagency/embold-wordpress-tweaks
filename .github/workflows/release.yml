@@ -43,7 +43,7 @@ jobs:
           bash scripts/sync-version-local.sh
 
       - name: Install dist-archive command
-        run: wp package install wp-cli/dist-archive-command:@stable --allow-root
+        run: wp package install wp-cli/dist-archive-command:v3.1.0 --allow-root
 
       - name: Install dependencies
         run: composer install --no-dev --prefer-dist --optimize-autoloader
