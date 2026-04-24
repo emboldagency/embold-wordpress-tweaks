@@ -5,6 +5,9 @@ namespace App\Admin;
 use App\Services\DisableMailService;
 
 class SettingsPage {
+
+
+
 	private const OPTION_NAME = 'embold_tweaks_options';
 	private DisableMailService $mailService;
 
@@ -138,7 +141,7 @@ class SettingsPage {
 				function () {
 					global $wp_settings_errors;
 					if ( isset( $wp_settings_errors ) ) {
-                        // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+						// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 						$wp_settings_errors = array_filter(
 							$wp_settings_errors,
 							function ( $error ) {
@@ -177,7 +180,7 @@ class SettingsPage {
 			return;
 		}
 
-		$options  = get_option( self::OPTION_NAME, [] );
+		$options         = get_option( self::OPTION_NAME, [] );
 		$xmlrpc_disabled = ! empty( $options['disable_xmlrpc'] ) || defined( 'EMBOLD_DISABLE_XMLRPC' ) && EMBOLD_DISABLE_XMLRPC;
 
 		if ( ! $xmlrpc_disabled ) {
@@ -187,7 +190,7 @@ class SettingsPage {
 		<div class="notice notice-warning is-dismissible">
 			<p>
 				<strong><?php esc_html_e( 'emBold Tweaks:', 'embold-wordpress-tweaks' ); ?></strong>
-				<?php esc_html_e('Warning: "Remove XMLRPC Pingback Ping" is active and may conflict with emBold Tweaks\'s XML-RPC disable feature. Please deactivate one of them.', 'embold-wordpress-tweaks'); ?>
+				<?php esc_html_e( 'Warning: "Remove XMLRPC Pingback Ping" is active and may conflict with emBold Tweaks\'s XML-RPC disable feature. Please deactivate one of them.', 'embold-wordpress-tweaks' ); ?>
 			</p>
 		</div>
 		<?php
@@ -558,7 +561,7 @@ class SettingsPage {
 			echo '<div class="' . esc_attr( $wrapper_class ) . '">';
 		}
 
-        // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 		printf(
 			'<input type="%s" name="%s" value="%s" class="regular-text" %s %s %s>',
 			esc_attr( $type ),
@@ -568,8 +571,8 @@ class SettingsPage {
 			$readonly_attr,
 			$autocomplete_attr
 		);
-        // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 		if ( $desc ) {
 			echo '<p class="description">' . wp_kses_post( $desc ) . '</p>';
 		}
@@ -686,8 +689,8 @@ class SettingsPage {
 					<p><?php echo esc_html( $msg ); ?></p>
 				</div>
 				<?php
-					// Clear settings-updated to avoid duplicate message
-					unset( $_GET['settings-updated'] );
+				// Clear settings-updated to avoid duplicate message
+				unset( $_GET['settings-updated'] );
 			endif;
 			?>
 			<?php if ( isset( $_GET['embold_err'] ) ) : ?>
@@ -696,7 +699,7 @@ class SettingsPage {
 					<p><?php echo esc_html( $err ); ?></p>
 				</div>
 			<?php endif; ?>
-            <?php // phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized ?>
+			<?php // phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized ?>
 
 			<?php
 			settings_errors( self::OPTION_NAME );
@@ -706,7 +709,7 @@ class SettingsPage {
 				function () {
 					global $wp_settings_errors;
 					if ( isset( $wp_settings_errors ) ) {
-                        // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+						// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 						$wp_settings_errors = [];
 					}
 				}
@@ -794,18 +797,18 @@ class SettingsPage {
 	}
 
 	public function renderElevatedEmailsField(): void {
-		$opts       = $this->getOptions();
-		$name       = self::OPTION_NAME . '[elevated_emails]';
-		$resolution = $this->resolveElevatedEmails();
+		$name = self::OPTION_NAME . '[elevated_emails]';
 
-		$is_const_controlled = $resolution['managed_by'] === 'ELEVATED_EMAILS';
+		$is_const_controlled = defined( 'ELEVATED_EMAILS' ) && constant( 'ELEVATED_EMAILS' );
 
-		// Determine display value
 		if ( $is_const_controlled ) {
-			$value = is_array( $resolution['emails'] ) ? implode( "\n", $resolution['emails'] ) : '';
+			$const_val = constant( 'ELEVATED_EMAILS' );
+			$emails    = is_array( $const_val ) ? $const_val : [];
 		} else {
-			$value = is_array( $opts['elevated_emails'] ) ? implode( "\n", $opts['elevated_emails'] ) : '';
+			$emails = $this->readSharedElevatedEmails();
 		}
+
+		$value = implode( "\n", $emails );
 
 		printf(
 			'<textarea name="%s" rows="4" class="large-text" %s>%s</textarea>',
@@ -816,8 +819,27 @@ class SettingsPage {
 		echo '<p class="description">' . esc_html__( 'Additional email addresses that can manage plugins and themes. Enter one email per line. Users with info@embold.com or info@wphaven.app are automatically elevated.', 'embold-wordpress-tweaks' ) . '</p>';
 
 		if ( $is_const_controlled ) {
-			echo wp_kses_post( $this->getConstantOverrideHtml( $resolution['managed_by'] ) );
+			echo wp_kses_post( $this->getConstantOverrideHtml( 'ELEVATED_EMAILS' ) );
 		}
+	}
+
+	/**
+	 * Read the elevated emails list from the shared source of truth.
+	 *
+	 * When wphaven-connect is installed, both plugins use its option key
+	 * (`wphaven_connect_options`) so wphaven-connect's ElevatedUsers reader
+	 * sees the same list edited here. Otherwise, use embold's own option.
+	 */
+	private function readSharedElevatedEmails(): array {
+		if ( class_exists( 'WPHavenConnect\\Providers\\SettingsServiceProvider' ) ) {
+			$wph_opts = get_option( 'wphaven_connect_options', [] );
+			$stored   = $wph_opts['elevated_emails'] ?? [];
+		} else {
+			$opts   = $this->getOptions();
+			$stored = $opts['elevated_emails'] ?? [];
+		}
+
+		return is_array( $stored ) ? $stored : [];
 	}
 
 	public function renderLooseUserRestrictionsField(): void {
@@ -834,14 +856,14 @@ class SettingsPage {
 		$extra    = $is_const ? ' ' . $this->getConstantOverrideHtml( 'LOOSE_USER_RESTRICTIONS' ) : '';
 
 		echo '<label>';
-        // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 		printf(
 			'<input type="checkbox" name="%s" value="1" %s %s> ',
 			esc_attr( $name ),
 			$checked,
 			$readonly
 		);
-        //phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
+		//phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		echo esc_html__( 'When checked, only elevated users can manage plugins, themes, and files. Uncheck this box to temporarily allow full access to all administrators.', 'embold-wordpress-tweaks' );
 		echo '</label>';
@@ -989,8 +1011,8 @@ class SettingsPage {
 		$output['loose_user_restrictions'] = ! isset( $input['loose_user_restrictions'] );
 
 		// --- Elevated Emails ---
-		// Only sanitize/store if wphaven-connect is NOT managing this setting
-		if ( ! class_exists( 'WPHavenConnect\\Providers\\SettingsServiceProvider' ) ) {
+		// Skip if locked by constant.
+		if ( ! ( defined( 'ELEVATED_EMAILS' ) && constant( 'ELEVATED_EMAILS' ) ) ) {
 			$emails = [];
 			if ( isset( $input['elevated_emails'] ) ) {
 				if ( is_array( $input['elevated_emails'] ) ) {
@@ -1006,7 +1028,23 @@ class SettingsPage {
 					}
 				}
 			}
-			$output['elevated_emails'] = array_values( array_filter( $emails, 'is_email' ) );
+			$emails = array_values( array_filter( $emails, 'is_email' ) );
+
+			// Write to the shared source of truth. When wphaven-connect is installed,
+			// its option is the canonical store (its ElevatedUsers reader only looks there);
+			// otherwise we keep the list in embold's own option.
+			if ( class_exists( 'WPHavenConnect\\Providers\\SettingsServiceProvider' ) ) {
+				$wph_opts = get_option( 'wphaven_connect_options', [] );
+				if ( ! is_array( $wph_opts ) ) {
+					$wph_opts = [];
+				}
+				$wph_opts['elevated_emails'] = $emails;
+				update_option( 'wphaven_connect_options', $wph_opts );
+				// Don't duplicate in embold's option — keep one source of truth.
+				unset( $output['elevated_emails'] );
+			} else {
+				$output['elevated_emails'] = $emails;
+			}
 		}
 
 		return $output;
