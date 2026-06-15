@@ -4,7 +4,7 @@
  * Plugin Name:        emBold WordPress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            1.8.1
+ * Version:            1.9.0
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -67,6 +67,9 @@ function embold_wordpress_tweaks_init() {
 	$plugin->disableEscapingAcfShortcodes();
 
 	$plugin->removeHowdy();
+
+	// Add "Duplicate" row action to posts/pages
+	$plugin->enablePostDuplication();
 
 	// Notice Suppression
 	$plugin->enableNoticeSuppression();

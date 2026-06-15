@@ -455,6 +455,132 @@ class EmboldWordpressTweaks {
 	}
 
 	/**
+	 * Add a "Duplicate" link to the row actions on posts, pages, and custom
+	 * post types, allowing them to be cloned as a new draft.
+	 */
+	public function enablePostDuplication() {
+		if ( ! $this->isFeatureEnabled( 'enable_duplicate_post', 'EMBOLD_ENABLE_DUPLICATE_POST' ) ) {
+			return;
+		}
+
+		// Add the "Duplicate" link to the row actions.
+		// post_row_actions covers posts and custom post types; page_row_actions covers pages.
+		add_filter( 'post_row_actions', [ $this, 'addDuplicateRowAction' ], 10, 2 );
+		add_filter( 'page_row_actions', [ $this, 'addDuplicateRowAction' ], 10, 2 );
+
+		// Handle the duplicate request (admin.php?action=embold_duplicate_post).
+		add_action( 'admin_action_embold_duplicate_post', [ $this, 'handleDuplicatePost' ] );
+	}
+
+	/**
+	 * Append the "Duplicate" action link to a post/page row.
+	 *
+	 * @param array    $actions The existing row action links.
+	 * @param \WP_Post $post    The post object for the current row.
+	 * @return array The modified row action links.
+	 */
+	public function addDuplicateRowAction( $actions, $post ) {
+		$post_type_obj = get_post_type_object( $post->post_type );
+
+		// Only show the link to users who can create posts of this type.
+		if ( ! $post_type_obj || ! current_user_can( $post_type_obj->cap->edit_posts ) ) {
+			return $actions;
+		}
+
+		$url = wp_nonce_url(
+			admin_url( 'admin.php?action=embold_duplicate_post&post=' . $post->ID ),
+			'embold_duplicate_post_' . $post->ID
+		);
+
+		$actions['embold_duplicate'] = sprintf(
+			'<a href="%s" title="%s">%s</a>',
+			esc_url( $url ),
+			esc_attr__( 'Duplicate this item as a new draft', 'embold-wordpress-tweaks' ),
+			esc_html__( 'Duplicate', 'embold-wordpress-tweaks' )
+		);
+
+		return $actions;
+	}
+
+	/**
+	 * Create a draft copy of the requested post and redirect to its edit screen.
+	 */
+	public function handleDuplicatePost() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$post_id = isset( $_GET['post'] ) ? absint( wp_unslash( $_GET['post'] ) ) : 0;
+
+		if ( ! $post_id ) {
+			wp_die( esc_html__( 'No item to duplicate has been provided.', 'embold-wordpress-tweaks' ) );
+		}
+
+		// Verify the request originated from our row-action link.
+		check_admin_referer( 'embold_duplicate_post_' . $post_id );
+
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			wp_die( esc_html__( 'The original item could not be found.', 'embold-wordpress-tweaks' ) );
+		}
+
+		// Capability check: user must be able to create posts of this type.
+		$post_type_obj = get_post_type_object( $post->post_type );
+		if ( ! $post_type_obj || ! current_user_can( $post_type_obj->cap->edit_posts ) ) {
+			wp_die( esc_html__( 'You are not allowed to duplicate this item.', 'embold-wordpress-tweaks' ) );
+		}
+
+		$current_user = wp_get_current_user();
+
+		// Build the new draft from the original.
+		$new_post_id = wp_insert_post(
+			[
+				'post_author'           => $current_user->ID,
+				'post_content'          => $post->post_content,
+				'post_content_filtered' => $post->post_content_filtered,
+				'post_excerpt'          => $post->post_excerpt,
+				'post_parent'           => $post->post_parent,
+				'post_password'         => $post->post_password,
+				'post_status'           => 'draft',
+				/* translators: %s: original post title. */
+				'post_title'            => sprintf( __( '%s (Copy)', 'embold-wordpress-tweaks' ), $post->post_title ),
+				'post_type'             => $post->post_type,
+				'comment_status'        => $post->comment_status,
+				'ping_status'           => $post->ping_status,
+				'menu_order'            => $post->menu_order,
+			],
+			true
+		);
+
+		if ( is_wp_error( $new_post_id ) || ! $new_post_id ) {
+			wp_die( esc_html__( 'Failed to create the duplicate.', 'embold-wordpress-tweaks' ) );
+		}
+
+		// Copy taxonomy terms (categories, tags, custom taxonomies).
+		$taxonomies = get_object_taxonomies( $post->post_type );
+		foreach ( $taxonomies as $taxonomy ) {
+			$terms = wp_get_object_terms( $post_id, $taxonomy, [ 'fields' => 'ids' ] );
+			if ( ! is_wp_error( $terms ) ) {
+				wp_set_object_terms( $new_post_id, $terms, $taxonomy, false );
+			}
+		}
+
+		// Copy post meta (ACF fields, block bindings, etc.), skipping internal keys.
+		$skip_meta = [ '_edit_lock', '_edit_last', '_wp_old_slug', '_wp_old_date' ];
+		$meta      = get_post_meta( $post_id );
+		foreach ( $meta as $key => $values ) {
+			if ( in_array( $key, $skip_meta, true ) ) {
+				continue;
+			}
+			foreach ( $values as $value ) {
+				// get_post_meta returns raw (still-serialized, unslashed) values;
+				// unserialize then re-slash so add_post_meta stores them correctly.
+				add_post_meta( $new_post_id, $key, wp_slash( maybe_unserialize( $value ) ) );
+			}
+		}
+
+		wp_safe_redirect( wp_get_referer() );
+		exit;
+	}
+
+	/**
 	 * Manage the MU-plugin for notice suppression.
 	 * Ensures early loading to catch _doing_it_wrong notices.
 	 */

@@ -291,6 +291,11 @@ class SettingsPage {
 				'const' => 'EMBOLD_REMOVE_HOWDY',
 				'desc'  => __( 'Removes the "Howdy" text from the admin bar greeting.', 'embold-wordpress-tweaks' ),
 			],
+			'enable_duplicate_post' => [
+				'label' => __( 'Enable Duplicate Post/Page', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_ENABLE_DUPLICATE_POST',
+				'desc'  => __( 'Adds a "Duplicate" link to the row actions on posts, pages, and custom post types to clone them (content, meta, and taxonomies) as a new draft.', 'embold-wordpress-tweaks' ),
+			],
 
 			// Stability & Performance (502 Error Prevention)
 			'defer_scripts'        => [
@@ -969,6 +974,7 @@ class SettingsPage {
 			'enable_slug_column',
 			'disable_acf_escaping',
 			'remove_howdy',
+			'enable_duplicate_post',
 			'suppress_notices',
 		];
 
@@ -1066,6 +1072,7 @@ class SettingsPage {
 			'enable_slug_column'            => true,
 			'disable_acf_escaping'          => true,
 			'remove_howdy'                  => true,
+			'enable_duplicate_post'         => true,
 			'suppress_notices'              => true,
 			'suppress_notice_extra_strings' => '',
 			'smtp_host'                     => 'mailpit',

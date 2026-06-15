@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.8.1
+Stable tag: 1.9.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -23,6 +23,7 @@ There are common changes we normally have to make in every generic WordPress web
 6. Allow searching for posts/pages by slug in the admin panel using the prefix 'slug:' before the search term.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
+9. Adds a "Duplicate" row action to posts, pages, and custom post types to clone them as a new draft.
 
 
 ## Strict requirements
@@ -47,6 +48,9 @@ This plugin uses constants in wp-config.php to control behavior across environme
 For a complete list of all available constants (including SMTP settings, security toggles, and performance options), please refer to the [GitHub Repository](https://github.com/emboldagency/embold-wordpress-tweaks).
 
 == Changelog ==
+
+= 1.9.0 =
+* Add "Duplicate Post/Page" feature: adds a "Duplicate" link to the row actions on posts, pages, and custom post types that clones the item (content, post meta, and taxonomy terms) as a new draft and opens it in the editor. Toggle via the settings page or the EMBOLD_ENABLE_DUPLICATE_POST constant.
 
 = 1.8.1 =
 * Fix bug preventing ELEVATED_EMAILS field from persisting.
