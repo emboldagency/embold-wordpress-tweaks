@@ -18,6 +18,14 @@ WordPress plugin that provides common tweaks and changes we normally have to mak
 6. Allow searching for posts/pages by slug in the admin panel using the prefix 'slug:' before the search term.
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
+9. Disables the built-in WordPress emoji JavaScript and styles.
+10. Disables Dashicons on the front end for logged out users.
+11. Removes the RSD (Really Simple Discovery) link tag from the page head.
+12. Removes the shortlink tag from the page head.
+13. Removes the WordPress version generator meta tag from the page head and RSS/Atom feeds.
+14. Removes the RSS/Atom feed link tags from the page head.
+15. Removes WP REST API metadata (discovery link tag and HTTP header) from the page head without disabling the REST API.
+16. Disables automatic oEmbed embedding (YouTube, Tweets, etc.) when pasting a URL into post content. Off by default.
 
 ## Strict requirements
 
@@ -118,6 +126,14 @@ Control debug logging and performance tweaks:
 - `EMBOLD_DEFER_SCRIPTS`: Defer non-critical scripts to avoid 502s
 - `EMBOLD_ASYNC_SCRIPTS`: Async admin scripts
 - `EMBOLD_CLEAN_IMG_TAGS`: Remove line breaks from img tags (Litespeed Cache)
+- `EMBOLD_DISABLE_WP_EMOJI`: Disable built-in WP emoji JS/styles (Disabled by default)
+- `EMBOLD_DISABLE_DASHICONS`: Disable Dashicons for logged out users (Disabled by default)
+- `EMBOLD_DISABLE_RSD_LINK`: Disable the RSD link tag (Disabled by default)
+- `EMBOLD_DISABLE_SHORTLINK`: Disable the shortlink tag (Disabled by default)
+- `EMBOLD_DISABLE_GENERATOR_TAG`: Disable the generator meta tag (Disabled by default)
+- `EMBOLD_DISABLE_RSS_LINKS`: Disable the RSS feed link tags (Disabled by default)
+- `EMBOLD_DISABLE_REST_METADATA`: Disable WP REST API metadata in the head (Disabled by default; does not disable the REST API)
+- `EMBOLD_DISABLE_OEMBED`: Disable automatic oEmbed embedding of pasted URLs (Off by default — oEmbed stays enabled unless this is turned on)
 
 ### Admin interface
 

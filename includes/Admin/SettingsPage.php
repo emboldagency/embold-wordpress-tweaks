@@ -260,7 +260,7 @@ class SettingsPage {
 
 		$tweaks = [
 			// Core Features & Security
-			'enable_svg'           => [
+			'enable_svg'             => [
 				'label' => __( 'Enable SVG Uploads', 'embold-wordpress-tweaks' ),
 				'const' => 'EMBOLD_ALLOW_SVG',
 				'desc'  => __( 'Allows SVG files to be uploaded to the Media Library.', 'embold-wordpress-tweaks' ) .
@@ -269,10 +269,50 @@ class SettingsPage {
 					'<span style="color: #646970;">' . __( 'SVGs can contain malicious code; ensure only trusted users have upload permissions.', 'embold-wordpress-tweaks' ) . '</span>' .
 					'</div>',
 			],
-			'disable_xmlrpc'       => [
+			'disable_xmlrpc'         => [
 				'label' => __( 'Disable XML-RPC', 'embold-wordpress-tweaks' ),
 				'const' => 'EMBOLD_DISABLE_XMLRPC',
 				'desc'  => __( 'Disables the XML-RPC API to protect against brute-force attacks and DDoS.', 'embold-wordpress-tweaks' ),
+			],
+			'disable_wp_emoji'       => [
+				'label' => __( 'Disable WP Emoji', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_WP_EMOJI',
+				'desc'  => __( 'Disables the built-in WordPress JavaScript for rendering emojis. Modern browsers support emojis natively, so this script is usually unnecessary overhead.', 'embold-wordpress-tweaks' ),
+			],
+			'disable_dashicons'      => [
+				'label' => __( 'Disable Dashicons', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_DASHICONS',
+				'desc'  => __( 'Disables admin icons (Dashicons) on the front end for logged out users.', 'embold-wordpress-tweaks' ),
+			],
+			'disable_rsd_link'       => [
+				'label' => __( 'Disable RSD Link', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_RSD_LINK',
+				'desc'  => __( 'Removes the Really Simple Discovery (RSD) link tag from the page head.', 'embold-wordpress-tweaks' ),
+			],
+			'disable_shortlink'      => [
+				'label' => __( 'Disable Shortlink', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_SHORTLINK',
+				'desc'  => __( 'Removes the shortlink tag from the page head.', 'embold-wordpress-tweaks' ),
+			],
+			'disable_generator_tag'  => [
+				'label' => __( 'Disable Generator Tag', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_GENERATOR_TAG',
+				'desc'  => __( 'Removes the WordPress version generator meta tag from the page head and RSS/Atom feeds.', 'embold-wordpress-tweaks' ),
+			],
+			'disable_rss_links'      => [
+				'label' => __( 'Disable RSS Links', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_RSS_LINKS',
+				'desc'  => __( 'Removes the RSS/Atom feed link tags from the page head.', 'embold-wordpress-tweaks' ),
+			],
+			'disable_rest_metadata'  => [
+				'label' => __( 'Disable WP REST Metadata', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_REST_METADATA',
+				'desc'  => __( 'Removes WP REST metadata from your &lt;head&gt; (the discovery link tag and HTTP header). It does not disable the REST API.', 'embold-wordpress-tweaks' ),
+			],
+			'disable_oembed'         => [
+				'label' => __( 'Disable oEmbed', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_DISABLE_OEMBED',
+				'desc'  => __( 'Disables the automatic embedding of some content (such as YouTube videos and Tweets) when pasting the URL into your blog posts.', 'embold-wordpress-tweaks' ),
 			],
 
 			// Admin UX
@@ -967,6 +1007,14 @@ class SettingsPage {
 		$booleans = [
 			'enable_svg',
 			'disable_xmlrpc',
+			'disable_wp_emoji',
+			'disable_dashicons',
+			'disable_rsd_link',
+			'disable_shortlink',
+			'disable_generator_tag',
+			'disable_rss_links',
+			'disable_rest_metadata',
+			'disable_oembed',
 			'defer_scripts',
 			'async_scripts',
 			'clean_img_tags',
@@ -1065,6 +1113,14 @@ class SettingsPage {
 			'mail_mode'                     => 'auto',
 			'enable_svg'                    => true,
 			'disable_xmlrpc'                => true,
+			'disable_wp_emoji'              => true,
+			'disable_dashicons'             => true,
+			'disable_rsd_link'              => true,
+			'disable_shortlink'             => true,
+			'disable_generator_tag'         => true,
+			'disable_rss_links'             => true,
+			'disable_rest_metadata'         => true,
+			'disable_oembed'                => false,
 			'defer_scripts'                 => true,
 			'async_scripts'                 => true,
 			'clean_img_tags'                => true,

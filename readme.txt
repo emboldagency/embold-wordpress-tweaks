@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.9.0
+Stable tag: 1.10.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -24,6 +24,14 @@ There are common changes we normally have to make in every generic WordPress web
 7. Adds a slug column to the posts/pages tables in the admin panel.
 8. Disables plugin, theme, and file management unless email is our set email. Additional emails can be set in the wp-config.
 9. Adds a "Duplicate" row action to posts, pages, and custom post types to clone them as a new draft.
+10. Disables the built-in WordPress emoji JavaScript and styles.
+11. Disables Dashicons on the front end for logged out users.
+12. Removes the RSD (Really Simple Discovery) link tag from the page head.
+13. Removes the shortlink tag from the page head.
+14. Removes the WordPress version generator meta tag from the page head and RSS/Atom feeds.
+15. Removes the RSS/Atom feed link tags from the page head.
+16. Removes WP REST API metadata (discovery link tag and HTTP header) from the page head without disabling the REST API.
+17. Disables automatic oEmbed embedding (YouTube, Tweets, etc.) when pasting a URL into post content. Off by default.
 
 
 ## Strict requirements
@@ -48,6 +56,16 @@ This plugin uses constants in wp-config.php to control behavior across environme
 For a complete list of all available constants (including SMTP settings, security toggles, and performance options), please refer to the [GitHub Repository](https://github.com/emboldagency/embold-wordpress-tweaks).
 
 == Changelog ==
+
+= 1.10.0 =
+* Add "Disable WP Emoji" feature: disables the built-in WordPress JavaScript/styles used to render emojis on the front end. Toggle via the settings page or the EMBOLD_DISABLE_WP_EMOJI constant.
+* Add "Disable Dashicons" feature: disables Dashicons on the front end for logged out users. Toggle via the settings page or the EMBOLD_DISABLE_DASHICONS constant.
+* Add "Disable RSD Link" feature: removes the Really Simple Discovery (RSD) link tag from the page head. Toggle via the settings page or the EMBOLD_DISABLE_RSD_LINK constant.
+* Add "Disable Shortlink" feature: removes the shortlink tag from the page head. Toggle via the settings page or the EMBOLD_DISABLE_SHORTLINK constant.
+* Add "Disable Generator Tag" feature: removes the WordPress version generator meta tag from the page head and RSS/Atom feeds. Toggle via the settings page or the EMBOLD_DISABLE_GENERATOR_TAG constant.
+* Add "Disable RSS Links" feature: removes the RSS/Atom feed link tags from the page head. Toggle via the settings page or the EMBOLD_DISABLE_RSS_LINKS constant.
+* Add "Disable WP REST Metadata" feature: removes WP REST metadata from the page head (discovery link tag and HTTP header) without disabling the REST API itself. Toggle via the settings page or the EMBOLD_DISABLE_REST_METADATA constant.
+* Add "Disable oEmbed" feature: disables the automatic embedding of content (such as YouTube videos and Tweets) when pasting a URL into post content. Unchecked (disabled) by default. Toggle via the settings page or the EMBOLD_DISABLE_OEMBED constant.
 
 = 1.9.0 =
 * Add "Duplicate Post/Page" feature: adds a "Duplicate" link to the row actions on posts, pages, and custom post types that clones the item (content, post meta, and taxonomy terms) as a new draft and opens it in the editor. Toggle via the settings page or the EMBOLD_ENABLE_DUPLICATE_POST constant.

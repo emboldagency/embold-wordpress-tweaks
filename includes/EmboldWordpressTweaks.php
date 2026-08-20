@@ -12,9 +12,9 @@ class EmboldWordpressTweaks {
 
 	/**
 	 * Helper to check if a feature is enabled.
-	 * Priority: Constant > Option > Default (True)
+	 * Priority: Constant > Option > Default
 	 */
-	private function isFeatureEnabled( string $key, ?string $constant = null ): bool {
+	private function isFeatureEnabled( string $key, ?string $constant = null, bool $default = true ): bool {
 		// 1. Check Constant
 		if ( $constant && defined( $constant ) ) {
 			return (bool) constant( $constant );
@@ -34,8 +34,8 @@ class EmboldWordpressTweaks {
 			return (bool) $opts[ $key ];
 		}
 
-		// 4. Default: If key is missing from DB, feature is ENABLED.
-		return true;
+		// 4. Key missing from DB: fall back to this feature's default state.
+		return $default;
 	}
 
 	private function getOption( string $key, $default = '' ) {
@@ -197,6 +197,189 @@ class EmboldWordpressTweaks {
 				unset( $methods['pingback.ping'] );
 				return $methods;
 			}
+		);
+	}
+
+	/**
+	 * Disable the built-in WordPress emoji detection script and styles.
+	 */
+	public function disableWpEmoji() {
+		if ( ! $this->isFeatureEnabled( 'disable_wp_emoji', 'EMBOLD_DISABLE_WP_EMOJI' ) ) {
+			return;
+		}
+
+		remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+		remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+		remove_action( 'wp_print_styles', 'print_emoji_styles' );
+		remove_action( 'admin_print_styles', 'print_emoji_styles' );
+		remove_filter( 'the_content_feed', 'wp_staticize_emoji' );
+		remove_filter( 'comment_text_rss', 'wp_staticize_emoji' );
+		remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
+
+		add_filter( 'tiny_mce_plugins', [ $this, 'removeEmojiTinymcePlugin' ] );
+		add_filter( 'wp_resource_hints', [ $this, 'removeEmojiDnsPrefetch' ], 10, 2 );
+	}
+
+	/**
+	 * Remove the emoji plugin from TinyMCE.
+	 *
+	 * @param array $plugins Active TinyMCE plugins.
+	 * @return array
+	 */
+	public function removeEmojiTinymcePlugin( $plugins ) {
+		if ( is_array( $plugins ) ) {
+			return array_diff( $plugins, [ 'wpemoji' ] );
+		}
+		return [];
+	}
+
+	/**
+	 * Remove the emoji CDN dns-prefetch resource hint.
+	 *
+	 * @param array  $urls          Resource hint URLs.
+	 * @param string $relation_type The relation type (e.g. 'dns-prefetch').
+	 * @return array
+	 */
+	public function removeEmojiDnsPrefetch( $urls, $relation_type ) {
+		if ( 'dns-prefetch' === $relation_type ) {
+			$emoji_svg_url = apply_filters( 'emoji_svg_url', 'https://s.w.org/images/core/emoji/' );
+			$urls          = array_diff( $urls, [ $emoji_svg_url ] );
+		}
+		return $urls;
+	}
+
+	/**
+	 * Disable the RSD (Really Simple Discovery) link tag in wp_head.
+	 */
+	public function disableRsdLink() {
+		if ( ! $this->isFeatureEnabled( 'disable_rsd_link', 'EMBOLD_DISABLE_RSD_LINK' ) ) {
+			return;
+		}
+
+		remove_action( 'wp_head', 'rsd_link' );
+	}
+
+	/**
+	 * Disable the shortlink tag/header in wp_head.
+	 */
+	public function disableShortlink() {
+		if ( ! $this->isFeatureEnabled( 'disable_shortlink', 'EMBOLD_DISABLE_SHORTLINK' ) ) {
+			return;
+		}
+
+		remove_action( 'wp_head', 'wp_shortlink_wp_head', 10 );
+	}
+
+	/**
+	 * Disable the WordPress generator meta tag (and the RSS/Atom feed generator tag).
+	 */
+	public function disableGeneratorTag() {
+		if ( ! $this->isFeatureEnabled( 'disable_generator_tag', 'EMBOLD_DISABLE_GENERATOR_TAG' ) ) {
+			return;
+		}
+
+		remove_action( 'wp_head', 'wp_generator' );
+		add_filter( 'the_generator', '__return_empty_string' );
+	}
+
+	/**
+	 * Disable the RSS feed link tags in wp_head.
+	 */
+	public function disableRssLinks() {
+		if ( ! $this->isFeatureEnabled( 'disable_rss_links', 'EMBOLD_DISABLE_RSS_LINKS' ) ) {
+			return;
+		}
+
+		remove_action( 'wp_head', 'feed_links', 2 );
+		remove_action( 'wp_head', 'feed_links_extra', 3 );
+	}
+
+	/**
+	 * Disable WP REST API metadata (discovery link tag and HTTP header).
+	 * This does not disable the REST API itself.
+	 */
+	public function disableRestMetadata() {
+		if ( ! $this->isFeatureEnabled( 'disable_rest_metadata', 'EMBOLD_DISABLE_REST_METADATA' ) ) {
+			return;
+		}
+
+		remove_action( 'wp_head', 'rest_output_link_wp_head' );
+		remove_action( 'template_redirect', 'rest_output_link_header', 11 );
+	}
+
+	/**
+	 * Disable automatic oEmbed conversion of pasted URLs (YouTube, Twitter/X, etc.)
+	 * and the associated discovery/REST endpoints.
+	 */
+	public function disableOembed() {
+		if ( ! $this->isFeatureEnabled( 'disable_oembed', 'EMBOLD_DISABLE_OEMBED', false ) ) {
+			return;
+		}
+
+		// Remove the oEmbed discovery link and host JS from the front end.
+		remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
+		remove_action( 'wp_head', 'wp_oembed_add_host_js' );
+		remove_filter( 'oembed_dataparse', 'wp_filter_oembed_result', 10 );
+		add_filter( 'embed_oembed_discover', '__return_false' );
+
+		// Remove the oEmbed REST routes, including the proxy the block editor
+		// uses to fetch a preview when a URL is pasted into post content.
+		remove_action( 'rest_api_init', 'wp_oembed_register_route' );
+
+		// Stop auto-converting bare URLs pasted into post content into embeds.
+		if ( isset( $GLOBALS['wp_embed'] ) ) {
+			remove_filter( 'the_content', [ $GLOBALS['wp_embed'], 'autoembed' ], 8 );
+		}
+
+		// Remove the embed plugin from TinyMCE (Classic Editor).
+		add_filter(
+			'tiny_mce_plugins',
+			function ( $plugins ) {
+				return is_array( $plugins ) ? array_diff( $plugins, [ 'wpembed' ] ) : [];
+			}
+		);
+
+		// Remove embed-specific rewrite rules and the "embed" query var.
+		add_filter(
+			'rewrite_rules_array',
+			function ( $rules ) {
+				foreach ( $rules as $rule => $rewrite ) {
+					if ( false !== strpos( $rewrite, 'embed=true' ) ) {
+						unset( $rules[ $rule ] );
+					}
+				}
+				return $rules;
+			}
+		);
+
+		add_action(
+			'init',
+			function () {
+				global $wp;
+				if ( isset( $wp->public_query_vars ) ) {
+					$wp->public_query_vars = array_diff( $wp->public_query_vars, [ 'embed' ] );
+				}
+			},
+			9999
+		);
+	}
+
+	/**
+	 * Disable Dashicons for logged out users on the front end.
+	 */
+	public function disableDashiconsForLoggedOutUsers() {
+		if ( ! $this->isFeatureEnabled( 'disable_dashicons', 'EMBOLD_DISABLE_DASHICONS' ) ) {
+			return;
+		}
+
+		add_action(
+			'wp_enqueue_scripts',
+			function () {
+				if ( ! is_user_logged_in() ) {
+					wp_deregister_style( 'dashicons' );
+				}
+			},
+			100
 		);
 	}
 

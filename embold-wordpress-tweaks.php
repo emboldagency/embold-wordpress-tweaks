@@ -4,7 +4,7 @@
  * Plugin Name:        emBold WordPress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            1.9.0
+ * Version:            1.10.0
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -57,6 +57,30 @@ function embold_wordpress_tweaks_init() {
 
 	// Disable XML-RPC
 	$plugin->disableXmlRpc();
+
+	// Disable the built-in WP emoji JavaScript/styles
+	$plugin->disableWpEmoji();
+
+	// Disable Dashicons for logged out users
+	$plugin->disableDashiconsForLoggedOutUsers();
+
+	// Disable the RSD link tag
+	$plugin->disableRsdLink();
+
+	// Disable the shortlink tag
+	$plugin->disableShortlink();
+
+	// Disable the WordPress generator meta tag
+	$plugin->disableGeneratorTag();
+
+	// Disable the RSS feed links in the page head
+	$plugin->disableRssLinks();
+
+	// Disable WP REST API metadata (head link + HTTP header)
+	$plugin->disableRestMetadata();
+
+	// Disable oEmbed auto-embedding of pasted URLs
+	$plugin->disableOembed();
 
 	// Remove line breaks from img tags if litespeed is enabled
 	$plugin->removeLineBreaksFromImgTags();
