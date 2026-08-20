@@ -22,8 +22,12 @@ jobs:
         with:
           php-version: '8.3'
           tools: composer, wp-cli
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Disable Composer's github-oauth. setup-php otherwise writes the
+          # Actions token (github.token, a ghs_ token) into Composer's global
+          # config, which Composer 2.10 rejects as "invalid characters",
+          # breaking both `composer install` and `wp package install`. Our
+          # packages are public, so no auth is needed.
+          github-token: ''
 
       - name: Cache Composer dependencies
         uses: actions/cache@v3
