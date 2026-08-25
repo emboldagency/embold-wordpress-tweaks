@@ -1118,7 +1118,7 @@ class SettingsPage {
 			'disable_rsd_link'              => true,
 			'disable_shortlink'             => true,
 			'disable_generator_tag'         => true,
-			'disable_rss_links'             => true,
+			'disable_rss_links'             => false,
 			'disable_rest_metadata'         => true,
 			'disable_oembed'                => false,
 			'defer_scripts'                 => true,

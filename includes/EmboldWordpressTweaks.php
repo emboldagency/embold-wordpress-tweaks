@@ -286,7 +286,7 @@ class EmboldWordpressTweaks {
 	 * Disable the RSS feed link tags in wp_head.
 	 */
 	public function disableRssLinks() {
-		if ( ! $this->isFeatureEnabled( 'disable_rss_links', 'EMBOLD_DISABLE_RSS_LINKS' ) ) {
+		if ( ! $this->isFeatureEnabled( 'disable_rss_links', 'EMBOLD_DISABLE_RSS_LINKS', false ) ) {
 			return;
 		}
 
