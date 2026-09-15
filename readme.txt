@@ -57,6 +57,9 @@ For a complete list of all available constants (including SMTP settings, securit
 
 == Changelog ==
 
+= 1.10.2 =
+* Internal: Upgraded deployment pipeline to generate checksum-compliant release zips.
+
 = 1.10.0 =
 * Add "Disable WP Emoji" feature: disables the built-in WordPress JavaScript/styles used to render emojis on the front end. Toggle via the settings page or the EMBOLD_DISABLE_WP_EMOJI constant.
 * Add "Disable Dashicons" feature: disables Dashicons on the front end for logged out users. Toggle via the settings page or the EMBOLD_DISABLE_DASHICONS constant.
