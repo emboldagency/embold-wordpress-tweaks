@@ -57,6 +57,9 @@ For a complete list of all available constants (including SMTP settings, securit
 
 == Changelog ==
 
+= 1.10.3 =
+* Version bump to fix WP version comparison downgrade warning
+
 = 1.10.2 =
 * Internal: Upgraded deployment pipeline to generate checksum-compliant release zips.
 
