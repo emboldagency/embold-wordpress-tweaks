@@ -57,6 +57,9 @@ For a complete list of all available constants (including SMTP settings, securit
 
 == Changelog ==
 
+= Unreleased =
+* Add "Highlight Custom HTML Blocks" feature: outlines and labels Custom HTML blocks in the block editor so embed code made only of script tags doesn't look like an empty block. On by default; toggle via the settings page or the EMBOLD_HIGHLIGHT_HTML_BLOCKS constant.
+
 = 1.10.4 =
 * Fix the plugin header version so WordPress offers this update; 1.10.3 was tagged with an older header, so sites never saw it.
 

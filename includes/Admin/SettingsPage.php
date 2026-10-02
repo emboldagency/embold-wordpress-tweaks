@@ -331,6 +331,11 @@ class SettingsPage {
 				'const' => 'EMBOLD_REMOVE_HOWDY',
 				'desc'  => __( 'Removes the "Howdy" text from the admin bar greeting.', 'embold-wordpress-tweaks' ),
 			],
+			'highlight_html_blocks' => [
+				'label' => __( 'Highlight Custom HTML Blocks', 'embold-wordpress-tweaks' ),
+				'const' => 'EMBOLD_HIGHLIGHT_HTML_BLOCKS',
+				'desc'  => __( 'Outlines and labels Custom HTML blocks in the block editor, so embed code made only of script tags no longer looks like an empty block.', 'embold-wordpress-tweaks' ),
+			],
 			'enable_duplicate_post' => [
 				'label' => __( 'Enable Duplicate Post/Page', 'embold-wordpress-tweaks' ),
 				'const' => 'EMBOLD_ENABLE_DUPLICATE_POST',
@@ -1022,6 +1027,7 @@ class SettingsPage {
 			'enable_slug_column',
 			'disable_acf_escaping',
 			'remove_howdy',
+			'highlight_html_blocks',
 			'enable_duplicate_post',
 			'suppress_notices',
 		];
@@ -1128,6 +1134,7 @@ class SettingsPage {
 			'enable_slug_column'            => true,
 			'disable_acf_escaping'          => true,
 			'remove_howdy'                  => true,
+			'highlight_html_blocks'         => true,
 			'enable_duplicate_post'         => true,
 			'suppress_notices'              => true,
 			'suppress_notice_extra_strings' => '',

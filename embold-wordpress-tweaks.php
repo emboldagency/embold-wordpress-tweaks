@@ -92,6 +92,9 @@ function embold_wordpress_tweaks_init() {
 
 	$plugin->removeHowdy();
 
+	// Outline Custom HTML blocks in the block editor
+	$plugin->highlightHtmlBlocksInEditor();
+
 	// Add "Duplicate" row action to posts/pages
 	$plugin->enablePostDuplication();
 
