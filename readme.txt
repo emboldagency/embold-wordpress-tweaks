@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.10.0
+Stable tag: 1.10.4
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -56,6 +56,9 @@ This plugin uses constants in wp-config.php to control behavior across environme
 For a complete list of all available constants (including SMTP settings, security toggles, and performance options), please refer to the [GitHub Repository](https://github.com/emboldagency/embold-wordpress-tweaks).
 
 == Changelog ==
+
+= 1.10.4 =
+* Fix the plugin header version so WordPress offers this update; 1.10.3 was tagged with an older header, so sites never saw it.
 
 = 1.10.3 =
 * Version bump to fix WP version comparison downgrade warning
