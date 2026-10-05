@@ -638,6 +638,28 @@ class EmboldWordpressTweaks {
 	}
 
 	/**
+	 * Outline Custom HTML blocks in the block editor. Embed code made only of
+	 * <script> tags renders as an empty block in the editor, so it looks deleted.
+	 */
+	public function highlightHtmlBlocksInEditor() {
+		if ( ! $this->isFeatureEnabled( 'highlight_html_blocks', 'EMBOLD_HIGHLIGHT_HTML_BLOCKS' ) ) {
+			return;
+		}
+
+		add_filter(
+			'block_editor_settings_all',
+			function ( $settings ) {
+				$settings['styles'][] = [
+					'css' => '[data-type="core/html"]{border:1px solid #1e1e1e;border-radius:2px;padding:24px;min-height:48px;box-sizing:border-box;background:#fff}'
+						. '[data-type="core/html"]::before{content:"</>  HTML";display:block;margin-bottom:16px;font:600 13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1e1e1e}',
+				];
+
+				return $settings;
+			}
+		);
+	}
+
+	/**
 	 * Add a "Duplicate" link to the row actions on posts, pages, and custom
 	 * post types, allowing them to be cloned as a new draft.
 	 */

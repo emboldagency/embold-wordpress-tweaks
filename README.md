@@ -142,6 +142,7 @@ Configure admin panel features:
 - `EMBOLD_ENABLE_SLUG_SEARCH`: Enable slug search
 - `EMBOLD_ENABLE_SLUG_COLUMN`: Enable slug column
 - `EMBOLD_REMOVE_HOWDY`: Remove "Howdy" greeting
+- `EMBOLD_HIGHLIGHT_HTML_BLOCKS`: Outline and label Custom HTML blocks in the block editor (On by default)
 
 ## Installation via Git Clone
 

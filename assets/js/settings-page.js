@@ -25,21 +25,62 @@ document.addEventListener("DOMContentLoaded", function () {
   })();
 
   /**
+   * Tabs: show the panels for one tab at a time and keep it in the URL hash.
+   * Every panel stays inside the one form, so saving still submits every field.
+   */
+  (function setupTabs() {
+    const links = document.querySelectorAll(".embold-tabs .nav-tab");
+    const panels = document.querySelectorAll(".embold-tab-panel");
+    if (!links.length || !panels.length) return;
+
+    const ids = Array.from(links, (link) => link.dataset.tab);
+    const referer = document.querySelector(
+      'form[action="options.php"] input[name="_wp_http_referer"]'
+    );
+
+    function activate(id) {
+      if (!ids.includes(id)) id = ids[0];
+      links.forEach((link) => {
+        const active = link.dataset.tab === id;
+        link.classList.toggle("nav-tab-active", active);
+        link.setAttribute("aria-current", active ? "page" : "false");
+      });
+      panels.forEach((panel) => {
+        panel.hidden = panel.dataset.tab !== id;
+      });
+      // options.php redirects to this field, so carry the tab through a save.
+      if (referer) {
+        referer.value = referer.value.split("#")[0] + "#" + id;
+      }
+    }
+
+    links.forEach((link) => {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        activate(link.dataset.tab);
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, "", "#" + link.dataset.tab);
+        }
+      });
+    });
+
+    window.addEventListener("hashchange", () => activate(location.hash.slice(1)));
+    activate(location.hash.slice(1));
+  })();
+
+  /**
    * Toggle visibility of the "Extra Suppression Strings" field
    * based on the "Suppress Debug Notices" checkbox state.
    */
   function setupSuppressNoticesToggle() {
     const checkbox = document.querySelector(
-      "input[type='checkbox'].embold-suppress-toggle"
+      "tr.embold-suppress-toggle input[type='checkbox']"
     );
-    const fieldWrapper = document.querySelector(".embold-suppress-strings-row");
+    const row = document.querySelector("tr.embold-suppress-strings-row");
 
-    if (!checkbox || !fieldWrapper) {
+    if (!checkbox || !row) {
       return;
     }
-
-    // The wrapper div is inside a TD, we need to hide the parent TR
-    const row = fieldWrapper.closest("tr");
 
     function updateVisibility() {
       if (row) {
@@ -66,8 +107,8 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     if (!select) return;
 
-    const wrappers = document.querySelectorAll(".embold-smtp-field");
-    if (!wrappers || wrappers.length === 0) return;
+    const rows = document.querySelectorAll("tr.embold-smtp-field");
+    if (!rows.length) return;
 
     function updateSmtpVisibility() {
       const effective =
@@ -76,11 +117,8 @@ document.addEventListener("DOMContentLoaded", function () {
           : select.value || "";
       const isSmtp = effective === "smtp_override";
 
-      wrappers.forEach(function (wrap) {
-        const row = wrap.closest("tr");
-        if (row) {
-          row.style.display = isSmtp ? "" : "none";
-        }
+      rows.forEach(function (row) {
+        row.style.display = isSmtp ? "" : "none";
       });
     }
 
