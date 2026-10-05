@@ -245,268 +245,318 @@ class SettingsPage {
 		);
 	}
 
+	/**
+	 * Settings page layout: tabs => sections => fields.
+	 *
+	 * Fields default to a checkbox. `type` picks another renderer (text, number,
+	 * email, password, textarea) and `render` names a bespoke render method.
+	 * `class` is applied to the field's table row by the Settings API.
+	 *
+	 * Within a section, order fields alphabetically by what they toggle (the
+	 * subject, not the verb), keeping a toggle and the fields it reveals together.
+	 */
+	private function getTabs(): array {
+		return [
+			'security'    => [
+				'label'    => __( 'Security', 'embold-wordpress-tweaks' ),
+				'sections' => [
+					'embold_tweaks_security'          => [
+						'title'  => __( 'Hardening', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'Reduce attack surface and information leakage.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'disable_generator_tag' => [
+								'label' => __( 'Generator Tag', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_GENERATOR_TAG',
+								'desc'  => __( 'Removes the WordPress version generator meta tag from the page head and RSS/Atom feeds.', 'embold-wordpress-tweaks' ),
+							],
+							'disable_rest_metadata' => [
+								'label' => __( 'REST Metadata', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_REST_METADATA',
+								'desc'  => __( 'Removes WP REST metadata from your &lt;head&gt; (the discovery link tag and HTTP header). It does not disable the REST API.', 'embold-wordpress-tweaks' ),
+							],
+							'enable_svg'            => [
+								'label' => __( 'SVG Uploads', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_ALLOW_SVG',
+								'desc'  => __( 'Allows SVG files to be uploaded to the Media Library.', 'embold-wordpress-tweaks' ) .
+									'<div class="embold-warning">' .
+									'<strong>' . __( 'Security Warning', 'embold-wordpress-tweaks' ) . '</strong>' .
+									'<span>' . __( 'SVGs can contain malicious code; ensure only trusted users have upload permissions.', 'embold-wordpress-tweaks' ) . '</span>' .
+									'</div>',
+							],
+							'disable_xmlrpc'        => [
+								'label' => __( 'XML-RPC', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_XMLRPC',
+								'desc'  => __( 'Disables the XML-RPC API to protect against brute-force attacks and DDoS.', 'embold-wordpress-tweaks' ),
+							],
+						],
+					],
+					'embold_tweaks_user_restrictions' => [
+						'title'  => __( 'User Restrictions', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'Control which users can manage plugins, themes, and files.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'elevated_emails'         => [
+								'label'  => __( 'Elevated Admin Emails', 'embold-wordpress-tweaks' ),
+								'render' => 'renderElevatedEmailsField',
+							],
+							'loose_user_restrictions' => [
+								'label'  => __( 'Enforce User Restrictions', 'embold-wordpress-tweaks' ),
+								'render' => 'renderLooseUserRestrictionsField',
+							],
+						],
+					],
+				],
+			],
+			'mail'        => [
+				'label'    => __( 'Mail', 'embold-wordpress-tweaks' ),
+				'sections' => [
+					'embold_tweaks_mail' => [
+						'title'  => __( 'Mail Behavior', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'Control how mail behaves per environment.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'mail_mode'       => [
+								'label'  => __( 'Mail Mode', 'embold-wordpress-tweaks' ),
+								'render' => 'renderMailModeField',
+							],
+							'smtp_host'       => [
+								'label'   => __( 'SMTP Host', 'embold-wordpress-tweaks' ),
+								'type'    => 'text',
+								'default' => 'mailpit',
+								'const'   => 'EMBOLD_SMTP_HOST',
+								'class'   => 'embold-smtp-field',
+							],
+							'smtp_port'       => [
+								'label'   => __( 'SMTP Port', 'embold-wordpress-tweaks' ),
+								'type'    => 'number',
+								'default' => '1025',
+								'const'   => 'EMBOLD_SMTP_PORT',
+								'class'   => 'embold-smtp-field',
+							],
+							'smtp_from_email' => [
+								'label'   => __( 'From Email', 'embold-wordpress-tweaks' ),
+								'type'    => 'email',
+								'default' => 'admin@wordpress.local',
+								'const'   => 'EMBOLD_SMTP_FROM_EMAIL',
+								'class'   => 'embold-smtp-field',
+							],
+							'smtp_from_name'  => [
+								'label'   => __( 'From Name', 'embold-wordpress-tweaks' ),
+								'type'    => 'text',
+								'default' => 'WordPress',
+								'const'   => 'EMBOLD_SMTP_FROM_NAME',
+								'class'   => 'embold-smtp-field',
+							],
+							'smtp_username'   => [
+								'label' => __( 'SMTP Username', 'embold-wordpress-tweaks' ),
+								'type'  => 'text',
+								'const' => 'EMBOLD_SMTP_USERNAME',
+								'class' => 'embold-smtp-field',
+							],
+							'smtp_password'   => [
+								'label' => __( 'SMTP Password', 'embold-wordpress-tweaks' ),
+								'type'  => 'password',
+								'const' => 'EMBOLD_SMTP_PASSWORD',
+								'class' => 'embold-smtp-field',
+							],
+							'smtp_secure'     => [
+								'label' => __( 'Encryption', 'embold-wordpress-tweaks' ),
+								'type'  => 'text',
+								'desc'  => __( 'Leave blank for no encryption, or use <code>ssl</code> or <code>tls</code>.', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_SMTP_SECURE',
+								'class' => 'embold-smtp-field',
+							],
+						],
+					],
+				],
+			],
+			'admin'       => [
+				'label'    => __( 'Admin & Editor', 'embold-wordpress-tweaks' ),
+				'sections' => [
+					'embold_tweaks_admin' => [
+						'title'  => __( 'Admin & Editor', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'Quality-of-life improvements for people editing the site.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'enable_duplicate_post' => [
+								'label' => __( 'Duplicate Posts', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_ENABLE_DUPLICATE_POST',
+								'desc'  => __( 'Adds a "Duplicate" link to the row actions on posts, pages, and custom post types to clone them (content, meta, and taxonomies) as a new draft.', 'embold-wordpress-tweaks' ),
+							],
+							'remove_howdy'          => [
+								'label' => __( '"Howdy" Greeting', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_REMOVE_HOWDY',
+								'desc'  => __( 'Removes the "Howdy" text from the admin bar greeting.', 'embold-wordpress-tweaks' ),
+							],
+							'highlight_html_blocks' => [
+								'label' => __( 'HTML Blocks', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_HIGHLIGHT_HTML_BLOCKS',
+								'desc'  => __( 'Outlines and labels Custom HTML blocks in the block editor, so embed code made only of script tags no longer looks like an empty block.', 'embold-wordpress-tweaks' ),
+							],
+							'enable_slug_column'    => [
+								'label' => __( 'Slug Column', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_ENABLE_SLUG_COLUMN',
+								'desc'  => __( 'Adds a "Slug" column to post lists.', 'embold-wordpress-tweaks' ),
+							],
+							'enable_slug_search'    => [
+								'label' => __( 'Slug Search', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_ENABLE_SLUG_SEARCH',
+								'desc'  => __( 'Allows searching by slug using the prefix <code>slug:your-slug</code>.', 'embold-wordpress-tweaks' ),
+							],
+						],
+					],
+				],
+			],
+			'performance' => [
+				'label'    => __( 'Performance', 'embold-wordpress-tweaks' ),
+				'sections' => [
+					'embold_tweaks_bloat'       => [
+						'title'  => __( 'Remove Bloat', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'Strip scripts, styles and head tags most sites never use.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'disable_dashicons' => [
+								'label' => __( 'Dashicons', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_DASHICONS',
+								'desc'  => __( 'Disables admin icons (Dashicons) on the front end for logged out users.', 'embold-wordpress-tweaks' ),
+							],
+							'disable_wp_emoji'  => [
+								'label' => __( 'Emoji', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_WP_EMOJI',
+								'desc'  => __( 'Disables the built-in WordPress JavaScript for rendering emojis. Modern browsers support emojis natively, so this script is usually unnecessary overhead.', 'embold-wordpress-tweaks' ),
+							],
+							'disable_oembed'    => [
+								'label' => __( 'oEmbed', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_OEMBED',
+								'desc'  => __( 'Disables the automatic embedding of some content (such as YouTube videos and Tweets) when pasting the URL into your blog posts.', 'embold-wordpress-tweaks' ),
+							],
+							'disable_rsd_link'  => [
+								'label' => __( 'RSD Link', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_RSD_LINK',
+								'desc'  => __( 'Removes the Really Simple Discovery (RSD) link tag from the page head.', 'embold-wordpress-tweaks' ),
+							],
+							'disable_rss_links' => [
+								'label' => __( 'RSS Links', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_RSS_LINKS',
+								'desc'  => __( 'Removes the RSS/Atom feed link tags from the page head.', 'embold-wordpress-tweaks' ),
+							],
+							'disable_shortlink' => [
+								'label' => __( 'Shortlink', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_SHORTLINK',
+								'desc'  => __( 'Removes the shortlink tag from the page head.', 'embold-wordpress-tweaks' ),
+							],
+						],
+					],
+					'embold_tweaks_performance' => [
+						'title'  => __( 'Script Loading', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'Script loading tweaks that also prevent 502 errors on local environments.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'async_scripts' => [
+								'label' => __( 'Admin Scripts', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_ASYNC_SCRIPTS',
+								'desc'  => __( 'Loads admin bar, heartbeat, and other admin scripts asynchronously.', 'embold-wordpress-tweaks' ),
+							],
+							'defer_scripts' => [
+								'label' => __( 'Non-Critical Scripts', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DEFER_SCRIPTS',
+								'desc'  => __( 'Defers common scripts (like admin bar JS) to improve load times and prevent 502 errors on local environments.', 'embold-wordpress-tweaks' ),
+							],
+						],
+					],
+				],
+			],
+			'developer'   => [
+				'label'    => __( 'Developer', 'embold-wordpress-tweaks' ),
+				'sections' => [
+					'embold_tweaks_compatibility' => [
+						'title'  => __( 'Third-Party Plugins', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'Workarounds for specific third-party plugins.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'disable_acf_escaping' => [
+								'label' => __( 'ACF Shortcodes', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_DISABLE_ACF_ESCAPING',
+								'desc'  => __( 'Reverts the ACF 6.2.5 security change to allow HTML in shortcode content.', 'embold-wordpress-tweaks' ),
+							],
+							'clean_img_tags'       => [
+								'label' => __( 'LiteSpeed Cache', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_CLEAN_IMG_TAGS',
+								'desc'  => __( 'Removes line breaks from img tags to ensure compatibility with LiteSpeed Cache.', 'embold-wordpress-tweaks' ),
+							],
+						],
+					],
+					'embold_tweaks_debugging'     => [
+						'title'  => __( 'Debug Log', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'Keep debug.log readable.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'suppress_notices'              => [
+								'label'        => __( 'Debug Notices', 'embold-wordpress-tweaks' ),
+								'const'        => 'EMBOLD_SUPPRESS_LOGS',
+								'legacy_const' => 'WPH_SUPPRESS_TEXTDOMAIN_NOTICES',
+								'desc'         => __( 'Suppresses noisy <code>_doing_it_wrong</code> notices (e.g. textdomain loading) and matching PHP errors/warnings to keep debug.log clean.', 'embold-wordpress-tweaks' ),
+								'class'        => 'embold-suppress-toggle',
+							],
+							'suppress_notice_extra_strings' => [
+								'label' => __( 'Extra Suppression Strings', 'embold-wordpress-tweaks' ),
+								'type'  => 'textarea',
+								'const' => 'EMBOLD_SUPPRESS_LOGS_EXTRA',
+								'desc'  => __( 'Add additional partial strings to suppress from <code>_doing_it_wrong</code> notices, one per line.', 'embold-wordpress-tweaks' ),
+								'class' => 'embold-suppress-strings-row',
+							],
+						],
+					],
+				],
+			],
+		];
+	}
+
+	/**
+	 * Flatten the tab layout into key => field args.
+	 */
+	private function getFields(): array {
+		$fields = [];
+		foreach ( $this->getTabs() as $tab ) {
+			foreach ( $tab['sections'] as $section ) {
+				$fields += $section['fields'];
+			}
+		}
+		return $fields;
+	}
+
+	private function isFieldLocked( array $field ): bool {
+		return ( ! empty( $field['const'] ) && defined( $field['const'] ) )
+			|| ( ! empty( $field['legacy_const'] ) && defined( $field['legacy_const'] ) );
+	}
+
 	public function registerSettings(): void {
 		register_setting( self::OPTION_NAME, self::OPTION_NAME, [ $this, 'sanitize' ] );
 
-		// --- SECTION: General Tweaks ---
-		add_settings_section(
-			'embold_tweaks_general',
-			__( 'General Tweaks', 'embold-wordpress-tweaks' ),
-			function () {
-				echo '<p>' . esc_html__( 'General Tweaks Description', 'embold-wordpress-tweaks' ) . '</p>';
-			},
-			'embold-wordpress-tweaks'
-		);
-
-		$tweaks = [
-			// Core Features & Security
-			'enable_svg'             => [
-				'label' => __( 'Enable SVG Uploads', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_ALLOW_SVG',
-				'desc'  => __( 'Allows SVG files to be uploaded to the Media Library.', 'embold-wordpress-tweaks' ) .
-					'<div style="margin-top: 1em; padding: 8px 12px; background-color: #fcf9e8; border-left: 4px solid #F1C21B;">' .
-					'<strong style="display: block; color: #b07b06; margin-bottom: 2px; padding-right: .5em;">' . __( 'Security Warning', 'embold-wordpress-tweaks' ) . '</strong>' .
-					'<span style="color: #646970;">' . __( 'SVGs can contain malicious code; ensure only trusted users have upload permissions.', 'embold-wordpress-tweaks' ) . '</span>' .
-					'</div>',
-			],
-			'disable_xmlrpc'         => [
-				'label' => __( 'Disable XML-RPC', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_XMLRPC',
-				'desc'  => __( 'Disables the XML-RPC API to protect against brute-force attacks and DDoS.', 'embold-wordpress-tweaks' ),
-			],
-			'disable_wp_emoji'       => [
-				'label' => __( 'Disable WP Emoji', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_WP_EMOJI',
-				'desc'  => __( 'Disables the built-in WordPress JavaScript for rendering emojis. Modern browsers support emojis natively, so this script is usually unnecessary overhead.', 'embold-wordpress-tweaks' ),
-			],
-			'disable_dashicons'      => [
-				'label' => __( 'Disable Dashicons', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_DASHICONS',
-				'desc'  => __( 'Disables admin icons (Dashicons) on the front end for logged out users.', 'embold-wordpress-tweaks' ),
-			],
-			'disable_rsd_link'       => [
-				'label' => __( 'Disable RSD Link', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_RSD_LINK',
-				'desc'  => __( 'Removes the Really Simple Discovery (RSD) link tag from the page head.', 'embold-wordpress-tweaks' ),
-			],
-			'disable_shortlink'      => [
-				'label' => __( 'Disable Shortlink', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_SHORTLINK',
-				'desc'  => __( 'Removes the shortlink tag from the page head.', 'embold-wordpress-tweaks' ),
-			],
-			'disable_generator_tag'  => [
-				'label' => __( 'Disable Generator Tag', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_GENERATOR_TAG',
-				'desc'  => __( 'Removes the WordPress version generator meta tag from the page head and RSS/Atom feeds.', 'embold-wordpress-tweaks' ),
-			],
-			'disable_rss_links'      => [
-				'label' => __( 'Disable RSS Links', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_RSS_LINKS',
-				'desc'  => __( 'Removes the RSS/Atom feed link tags from the page head.', 'embold-wordpress-tweaks' ),
-			],
-			'disable_rest_metadata'  => [
-				'label' => __( 'Disable WP REST Metadata', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_REST_METADATA',
-				'desc'  => __( 'Removes WP REST metadata from your &lt;head&gt; (the discovery link tag and HTTP header). It does not disable the REST API.', 'embold-wordpress-tweaks' ),
-			],
-			'disable_oembed'         => [
-				'label' => __( 'Disable oEmbed', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_OEMBED',
-				'desc'  => __( 'Disables the automatic embedding of some content (such as YouTube videos and Tweets) when pasting the URL into your blog posts.', 'embold-wordpress-tweaks' ),
-			],
-
-			// Admin UX
-			'enable_slug_search'   => [
-				'label' => __( 'Enable Slug Search', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_ENABLE_SLUG_SEARCH',
-				'desc'  => __( 'Allows searching by slug using the prefix <code>slug:your-slug</code>.', 'embold-wordpress-tweaks' ),
-			],
-			'enable_slug_column'   => [
-				'label' => __( 'Enable Slug Column', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_ENABLE_SLUG_COLUMN',
-				'desc'  => __( 'Adds a "Slug" column to post lists.', 'embold-wordpress-tweaks' ),
-			],
-			'remove_howdy'         => [
-				'label' => __( 'Remove "Howdy"', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_REMOVE_HOWDY',
-				'desc'  => __( 'Removes the "Howdy" text from the admin bar greeting.', 'embold-wordpress-tweaks' ),
-			],
-			'highlight_html_blocks' => [
-				'label' => __( 'Highlight Custom HTML Blocks', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_HIGHLIGHT_HTML_BLOCKS',
-				'desc'  => __( 'Outlines and labels Custom HTML blocks in the block editor, so embed code made only of script tags no longer looks like an empty block.', 'embold-wordpress-tweaks' ),
-			],
-			'enable_duplicate_post' => [
-				'label' => __( 'Enable Duplicate Post/Page', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_ENABLE_DUPLICATE_POST',
-				'desc'  => __( 'Adds a "Duplicate" link to the row actions on posts, pages, and custom post types to clone them (content, meta, and taxonomies) as a new draft.', 'embold-wordpress-tweaks' ),
-			],
-
-			// Stability & Performance (502 Error Prevention)
-			'defer_scripts'        => [
-				'label' => __( 'Defer Non-Critical Scripts', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DEFER_SCRIPTS',
-				'desc'  => __( 'Defers common scripts (like admin bar JS) to improve load times and prevent 502 errors on local environments.', 'embold-wordpress-tweaks' ),
-			],
-			'async_scripts'        => [
-				'label' => __( 'Async Admin Scripts', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_ASYNC_SCRIPTS',
-				'desc'  => __( 'Loads admin bar, heartbeat, and other admin scripts asynchronously.', 'embold-wordpress-tweaks' ),
-			],
-
-			// Specific Compatibility Fixes
-			'disable_acf_escaping' => [
-				'label' => __( 'Disable ACF Shortcode Escaping', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_DISABLE_ACF_ESCAPING',
-				'desc'  => __( 'Reverts the ACF 6.2.5 security change to allow HTML in shortcode content.', 'embold-wordpress-tweaks' ),
-			],
-			'clean_img_tags'       => [
-				'label' => __( 'LiteSpeed Image Cleanup', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_CLEAN_IMG_TAGS',
-				'desc'  => __( 'Removes line breaks from img tags to ensure compatibility with LiteSpeed Cache.', 'embold-wordpress-tweaks' ),
-			],
+		$renderers = [
+			'checkbox' => 'renderCheckboxField',
+			'textarea' => 'renderTextareaField',
 		];
 
-		foreach ( $tweaks as $key => $args ) {
-			add_settings_field(
-				$key,
-				$args['label'],
-				[ $this, 'renderCheckboxField' ],
-				'embold-wordpress-tweaks',
-				'embold_tweaks_general',
-				array_merge( [ 'key' => $key ], $args )
-			);
-		}
+		foreach ( $this->getTabs() as $tab ) {
+			foreach ( $tab['sections'] as $section_id => $section ) {
+				$desc = $section['desc'];
+				add_settings_section(
+					$section_id,
+					$section['title'],
+					function () use ( $desc ) {
+						echo '<p>' . esc_html( $desc ) . '</p>';
+					},
+					'embold-wordpress-tweaks'
+				);
 
-		// Manually register Suppress Notices so they are grouped
-		add_settings_field(
-			'suppress_notices',
-			__( 'Suppress Debug Notices', 'embold-wordpress-tweaks' ),
-			[ $this, 'renderCheckboxField' ],
-			'embold-wordpress-tweaks',
-			'embold_tweaks_general',
-			[
-				'key'          => 'suppress_notices',
-				'const'        => 'EMBOLD_SUPPRESS_LOGS',
-				'legacy_const' => 'WPH_SUPPRESS_TEXTDOMAIN_NOTICES',
-				'desc'         => __( 'Suppresses noisy <code>_doing_it_wrong</code> notices (e.g. textdomain loading) and matching PHP errors/warnings to keep debug.log clean.', 'embold-wordpress-tweaks' ),
-				'class'        => 'embold-suppress-toggle', // Helper class for JS
-			]
-		);
+				foreach ( $section['fields'] as $key => $args ) {
+					$type     = $args['type'] ?? 'checkbox';
+					$renderer = $args['render'] ?? ( $renderers[ $type ] ?? 'renderTextField' );
 
-		add_settings_field(
-			'suppress_notice_extra_strings',
-			__( 'Extra Suppression Strings', 'embold-wordpress-tweaks' ),
-			[ $this, 'renderTextareaField' ],
-			'embold-wordpress-tweaks',
-			'embold_tweaks_general',
-			[
-				'key'       => 'suppress_notice_extra_strings',
-				'const'     => 'EMBOLD_SUPPRESS_LOGS_EXTRA',
-				'desc'      => __( 'Add additional partial strings to suppress from <code>_doing_it_wrong</code> notices, one per line.', 'embold-wordpress-tweaks' ),
-				'row_class' => 'embold-suppress-strings-row', // Helper class for JS target
-			]
-		);
-
-		// --- SECTION: User Restrictions ---
-		add_settings_section(
-			'embold_tweaks_user_restrictions',
-			__( 'User Restrictions', 'embold-wordpress-tweaks' ),
-			function () {
-				echo '<p>' . esc_html__( 'Control which users can manage plugins, themes, and files.', 'embold-wordpress-tweaks' ) . '</p>';
-			},
-			'embold-wordpress-tweaks'
-		);
-
-		add_settings_field(
-			'elevated_emails',
-			__( 'Elevated Admin Emails', 'embold-wordpress-tweaks' ),
-			[ $this, 'renderElevatedEmailsField' ],
-			'embold-wordpress-tweaks',
-			'embold_tweaks_user_restrictions'
-		);
-
-		add_settings_field(
-			'loose_user_restrictions',
-			__( 'Enforce User Restrictions', 'embold-wordpress-tweaks' ),
-			[ $this, 'renderLooseUserRestrictionsField' ],
-			'embold-wordpress-tweaks',
-			'embold_tweaks_user_restrictions'
-		);
-
-		// --- SECTION: Mail Behavior ---
-		add_settings_section(
-			'embold_tweaks_mail',
-			__( 'Mail Behavior', 'embold-wordpress-tweaks' ),
-			function () {
-				echo '<p>' . esc_html__( 'Control how mail behaves per environment.', 'embold-wordpress-tweaks' ) . '</p>';
-			},
-			'embold-wordpress-tweaks'
-		);
-
-		add_settings_field(
-			'mail_mode',
-			__( 'Mail Mode', 'embold-wordpress-tweaks' ),
-			[ $this, 'renderMailModeField' ],
-			'embold-wordpress-tweaks',
-			'embold_tweaks_mail'
-		);
-
-		// SMTP Fields
-		$smtp_fields = [
-			'smtp_host'       => [
-				'label'   => __( 'SMTP Host', 'embold-wordpress-tweaks' ),
-				'default' => 'mailpit',
-				'const'   => 'EMBOLD_SMTP_HOST',
-			],
-			'smtp_port'       => [
-				'label'   => __( 'SMTP Port', 'embold-wordpress-tweaks' ),
-				'default' => '1025',
-				'type'    => 'number',
-				'const'   => 'EMBOLD_SMTP_PORT',
-			],
-			'smtp_from_email' => [
-				'label'   => __( 'From Email', 'embold-wordpress-tweaks' ),
-				'default' => 'admin@wordpress.local',
-				'type'    => 'email',
-				'const'   => 'EMBOLD_SMTP_FROM_EMAIL',
-			],
-			'smtp_from_name'  => [
-				'label'   => __( 'From Name', 'embold-wordpress-tweaks' ),
-				'default' => 'WordPress',
-				'const'   => 'EMBOLD_SMTP_FROM_NAME',
-			],
-			'smtp_username'   => [
-				'label' => __( 'SMTP Username', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_SMTP_USERNAME',
-			],
-			'smtp_password'   => [
-				'label' => __( 'SMTP Password', 'embold-wordpress-tweaks' ),
-				'type'  => 'password',
-				'const' => 'EMBOLD_SMTP_PASSWORD',
-			],
-			'smtp_secure'     => [
-				'label' => __( 'Encryption', 'embold-wordpress-tweaks' ),
-				'desc'  => __( 'Leave blank for no encryption, or use <code>ssl</code> or <code>tls</code>.', 'embold-wordpress-tweaks' ),
-				'const' => 'EMBOLD_SMTP_SECURE',
-			],
-		];
-
-		foreach ( $smtp_fields as $key => $args ) {
-			add_settings_field(
-				$key,
-				$args['label'],
-				[ $this, 'renderTextField' ],
-				'embold-wordpress-tweaks',
-				'embold_tweaks_mail',
-				array_merge(
-					[
-						'key'           => $key,
-						'wrapper_class' => 'embold-smtp-field',
-					],
-					$args
-				)
-			);
+					add_settings_field(
+						$key,
+						$args['label'],
+						[ $this, $renderer ],
+						'embold-wordpress-tweaks',
+						$section_id,
+						array_merge( [ 'key' => $key ], $args )
+					);
+				}
+			}
 		}
 	}
 
@@ -518,7 +568,6 @@ class SettingsPage {
 		$const        = $args['const'] ?? null;
 		$legacy_const = $args['legacy_const'] ?? null;
 		$desc         = $args['desc'] ?? '';
-		$extra_class  = $args['class'] ?? '';
 
 		$opts = $this->getOptions();
 
@@ -549,11 +598,10 @@ class SettingsPage {
 
 		echo '<label>';
 		printf(
-			'<input type="checkbox" name="%s" value="1" %s %s class="%s"> ',
+			'<input type="checkbox" name="%s" value="1" %s %s> ',
 			esc_attr( $name ),
 			checked( 1, $is_checked ? 1 : 0, false ),
-			$disabled_attr, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			esc_attr( $extra_class )
+			$disabled_attr // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		);
 
 		if ( $desc ) {
@@ -562,9 +610,7 @@ class SettingsPage {
 		echo '</label>';
 
 		if ( $is_locked && $locked_const_name ) {
-			echo '<p class="description wph-const-override">' .
-				sprintf( esc_html__( 'Locked by constant: <code>%s</code>', 'embold-wordpress-tweaks' ), esc_html( $locked_const_name ) ) .
-				'</p>';
+			echo wp_kses_post( $this->getConstantOverrideHtml( $locked_const_name ) );
 		}
 	}
 
@@ -574,7 +620,6 @@ class SettingsPage {
 		$desc          = $args['desc'] ?? '';
 		$default       = $args['default'] ?? '';
 		$const         = $args['const'] ?? null;
-		$wrapper_class = $args['wrapper_class'] ?? '';
 
 		$opts = $this->getOptions();
 
@@ -607,10 +652,6 @@ class SettingsPage {
 
 		$name = self::OPTION_NAME . "[$key]";
 
-		if ( $wrapper_class ) {
-			echo '<div class="' . esc_attr( $wrapper_class ) . '">';
-		}
-
 		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 		printf(
 			'<input type="%s" name="%s" value="%s" class="regular-text" %s %s %s>',
@@ -630,17 +671,12 @@ class SettingsPage {
 		if ( $is_locked && $locked_const_name ) {
 			echo wp_kses_post( $this->getConstantOverrideHtml( $locked_const_name ) );
 		}
-
-		if ( $wrapper_class ) {
-			echo '</div>';
-		}
 	}
 
 	public function renderTextareaField( $args ): void {
 		$key       = $args['key'];
 		$const     = $args['const'] ?? null;
 		$desc      = $args['desc'] ?? '';
-		$row_class = $args['row_class'] ?? '';
 
 		$opts = $this->getOptions();
 
@@ -664,13 +700,6 @@ class SettingsPage {
 		$name          = self::OPTION_NAME . "[$key]";
 		$readonly_attr = $is_locked ? 'readonly' : '';
 
-		// Hacky way to add a class to the TR via the field callback output?
-		// WP doesn't let us easily add class to the TR from add_settings_field.
-		// We will wrap this in a div that our JS can find to hide the parent TR.
-		if ( $row_class ) {
-			echo '<div class="' . esc_attr( $row_class ) . '">';
-		}
-
 		printf(
 			'<textarea name="%s" rows="3" class="large-text" %s>%s</textarea>',
 			esc_attr( $name ),
@@ -684,10 +713,6 @@ class SettingsPage {
 
 		if ( $is_locked && $locked_const_name ) {
 			echo wp_kses_post( $this->getConstantOverrideHtml( $locked_const_name ) );
-		}
-
-		if ( $row_class ) {
-			echo '</div>';
 		}
 	}
 
@@ -715,7 +740,7 @@ class SettingsPage {
 
 		$status_label = $this->formatModeLabel( $effective );
 
-		echo '<div style="margin-top: 10px; padding: 10px; background: #f0f0f1; border-left: 4px solid #72aee6;">';
+		echo '<div class="embold-status-box">';
 		echo '<strong>' . esc_html__( 'Effective Status:', 'embold-wordpress-tweaks' ) . '</strong> ';
 		echo '<span>' . esc_html( $status_label ) . '</span>';
 		echo '</div>';
@@ -723,7 +748,7 @@ class SettingsPage {
 		if ( ! empty( $locked_by ) ) {
 			echo wp_kses_post( $this->getConstantOverrideHtml( $locked_by ) );
 		} else {
-			echo '<p class="description" style="color: #646970;">' . esc_html( sprintf( __( 'Source: %s', 'embold-wordpress-tweaks' ), $source ) ) . '</p>';
+			echo '<p class="description">' . esc_html( sprintf( __( 'Source: %s', 'embold-wordpress-tweaks' ), $source ) ) . '</p>';
 		}
 	}
 
@@ -766,16 +791,33 @@ class SettingsPage {
 			);
 			?>
 
+			<?php $tabs = $this->getTabs(); ?>
+
+			<nav class="nav-tab-wrapper embold-tabs" aria-label="<?php esc_attr_e( 'Settings sections', 'embold-wordpress-tweaks' ); ?>">
+				<?php foreach ( $tabs as $tab_id => $tab ) : ?>
+					<a href="#<?php echo esc_attr( $tab_id ); ?>" class="nav-tab" data-tab="<?php echo esc_attr( $tab_id ); ?>"><?php echo esc_html( $tab['label'] ); ?></a>
+				<?php endforeach; ?>
+			</nav>
+
 			<form method="post" action="options.php">
 				<?php
 				settings_fields( self::OPTION_NAME );
-				do_settings_sections( 'embold-wordpress-tweaks' );
+
+				foreach ( $tabs as $tab_id => $tab ) {
+					echo '<div class="embold-tab-panel" data-tab="' . esc_attr( $tab_id ) . '">';
+					foreach ( array_keys( $tab['sections'] ) as $section_id ) {
+						$this->renderSection( $section_id, count( $tab['sections'] ) > 1 );
+					}
+					echo '</div>';
+				}
+
 				// Ensure the save button has a unique id and name to avoid duplicate #submit warnings and method shadowing
 				submit_button( null, 'primary', 'embold_save_changes', true, [ 'id' => 'embold-save-changes' ] );
 				?>
 			</form>
 
-			<hr style="margin-top: 40px; margin-bottom: 20px; border-color: #dcdcde;">
+			<div class="embold-tab-panel" data-tab="mail">
+			<hr class="embold-divider">
 
 			<h2><?php echo esc_html__( 'Test Configuration', 'embold-wordpress-tweaks' ); ?></h2>
 			<p class="description">
@@ -798,8 +840,9 @@ class SettingsPage {
 					</tr>
 				</table>
 			</form>
+			</div>
 
-			<hr style="margin-top: 40px; margin-bottom: 20px; border-color: #dcdcde;">
+			<hr class="embold-divider">
 
 			<h2><?php echo esc_html__( 'Reset Settings', 'embold-wordpress-tweaks' ); ?></h2>
 			<p><?php echo esc_html__( 'This will delete plugin options, reverting settings to defaults.', 'embold-wordpress-tweaks' ); ?>
@@ -823,6 +866,30 @@ class SettingsPage {
 		</div>
 		<?php
 	}
+	/**
+	 * Render one registered section, like do_settings_sections() does for all of them.
+	 */
+	private function renderSection( string $section_id, bool $show_title ): void {
+		global $wp_settings_sections;
+
+		$section = $wp_settings_sections['embold-wordpress-tweaks'][ $section_id ] ?? null;
+		if ( ! $section ) {
+			return;
+		}
+
+		if ( $show_title ) {
+			echo '<h2>' . esc_html( $section['title'] ) . '</h2>';
+		}
+
+		if ( $section['callback'] ) {
+			call_user_func( $section['callback'], $section );
+		}
+
+		echo '<table class="form-table" role="presentation">';
+		do_settings_fields( 'embold-wordpress-tweaks', $section_id );
+		echo '</table>';
+	}
+
 	private function renderOption( string $value, string $label, string $current ): void {
 		printf(
 			'<option value="%s" %s>%s</option>',
@@ -922,7 +989,7 @@ class SettingsPage {
 		}
 
 		if ( ! $is_const && $source === 'default' ) {
-			echo '<p class="description" style="color: #666;"><em>' .
+			echo '<p class="description"><em>' .
 				esc_html__( 'Default Status: Restrictions are active (Safe).', 'embold-wordpress-tweaks' ) .
 				'</em></p>';
 		}
@@ -1008,38 +1075,37 @@ class SettingsPage {
 	public function sanitize( $input ): array {
 		$output = get_option( self::OPTION_NAME, [] );
 
-		// --- General Tweaks ---
-		$booleans = [
-			'enable_svg',
-			'disable_xmlrpc',
-			'disable_wp_emoji',
-			'disable_dashicons',
-			'disable_rsd_link',
-			'disable_shortlink',
-			'disable_generator_tag',
-			'disable_rss_links',
-			'disable_rest_metadata',
-			'disable_oembed',
-			'defer_scripts',
-			'async_scripts',
-			'clean_img_tags',
-			'enable_slug_search',
-			'enable_slug_column',
-			'disable_acf_escaping',
-			'remove_howdy',
-			'highlight_html_blocks',
-			'enable_duplicate_post',
-			'suppress_notices',
-		];
+		// --- Registry fields ---
+		// Fields locked by a constant keep their stored value: a disabled checkbox
+		// isn't submitted, and a readonly input would copy the constant into the DB.
+		foreach ( $this->getFields() as $key => $field ) {
+			if ( isset( $field['render'] ) || $this->isFieldLocked( $field ) ) {
+				continue;
+			}
 
-		foreach ( $booleans as $key ) {
-			$output[ $key ] = isset( $input[ $key ] );
-		}
+			$type = $field['type'] ?? 'checkbox';
 
-		// Textarea: Suppress Extra Strings (only if not locked by constant)
-		if ( ! defined( 'EMBOLD_SUPPRESS_LOGS_EXTRA' ) ) {
-			if ( isset( $input['suppress_notice_extra_strings'] ) ) {
-				$output['suppress_notice_extra_strings'] = sanitize_textarea_field( $input['suppress_notice_extra_strings'] );
+			if ( $type === 'checkbox' ) {
+				$output[ $key ] = isset( $input[ $key ] );
+				continue;
+			}
+
+			if ( ! isset( $input[ $key ] ) ) {
+				continue;
+			}
+
+			switch ( $type ) {
+				case 'number':
+					$output[ $key ] = absint( $input[ $key ] );
+					break;
+				case 'email':
+					$output[ $key ] = sanitize_email( $input[ $key ] );
+					break;
+				case 'textarea':
+					$output[ $key ] = sanitize_textarea_field( $input[ $key ] );
+					break;
+				default:
+					$output[ $key ] = sanitize_text_field( $input[ $key ] );
 			}
 		}
 
@@ -1052,22 +1118,12 @@ class SettingsPage {
 			}
 		}
 
-		// --- SMTP Settings ---
-		$smtp_keys = [ 'smtp_host', 'smtp_from_name', 'smtp_username', 'smtp_password', 'smtp_secure' ];
-		foreach ( $smtp_keys as $key ) {
-			if ( isset( $input[ $key ] ) ) {
-				$output[ $key ] = sanitize_text_field( $input[ $key ] );
-			}
-		}
-		if ( isset( $input['smtp_port'] ) ) {
-			$output['smtp_port'] = absint( $input['smtp_port'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		}
-		if ( isset( $input['smtp_from_email'] ) ) {
-			$output['smtp_from_email'] = sanitize_email( $input['smtp_from_email'] );
-		}
-
 		// --- User Restrictions (Inverted Logic) ---
-		$output['loose_user_restrictions'] = ! isset( $input['loose_user_restrictions'] );
+		// The checkbox is disabled when the constant is set, so an unsubmitted box
+		// must not be read as "unchecked" — that would silently loosen restrictions.
+		if ( ! defined( 'LOOSE_USER_RESTRICTIONS' ) ) {
+			$output['loose_user_restrictions'] = ! isset( $input['loose_user_restrictions'] );
+		}
 
 		// --- Elevated Emails ---
 		// Skip if locked by constant.
@@ -1153,19 +1209,13 @@ class SettingsPage {
 	/**
 	 * Generate HTML snippet indicating a constant override
 	 */
-	private function getConstantOverrideHtml( $constant_name, $is_inline = false ) {
+	private function getConstantOverrideHtml( $constant_name ) {
 		$message = wp_kses_post(
 			sprintf(
 				__( 'Locked by constant: <code>%s</code>', 'embold-wordpress-tweaks' ),
-				$constant_name
+				esc_html( $constant_name )
 			)
 		);
-		$class   = 'description wph-const-override';
-
-		if ( $is_inline ) {
-			return '<span class="' . esc_attr( $class ) . '">' . $message . '</span>';
-		}
-
-		return '<p class="' . esc_attr( $class ) . '">' . $message . '</p>';
+		return '<p class="description wph-const-override">' . $message . '</p>';
 	}
 }

@@ -12,52 +12,41 @@
   line-height: 2;
 }
 
-/* Modal styles for test email warning */
-
-#embold-test-modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 9999;
+.embold-tabs {
+  margin-bottom: 1em;
 }
 
-#embold-test-modal .embold-modal-inner {
-  background: #fff;
-  padding: 20px;
-  border-radius: 6px;
-  max-width: 520px;
-  width: 90%;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+.embold-tab-panel[hidden] {
+  display: none;
 }
 
-#embold-test-modal h3 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-}
-
-#embold-test-modal p {
-  margin: 0 0 16px;
-}
-
-#embold-test-modal .embold-modal-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.embold-btn {
+.embold-warning {
+  margin-top: 1em;
   padding: 8px 12px;
-  border: 1px solid #ccc;
-  background: #f7f7f7;
-  border-radius: 4px;
-  cursor: pointer;
+  background-color: #fcf9e8;
+  border-left: 4px solid #f1c21b;
 }
 
-.embold-save-btn {
-  background: #0073aa;
-  color: #fff;
-  border-color: #0073aa;
+.embold-warning strong {
+  display: block;
+  color: #b07b06;
+  margin-bottom: 2px;
+  padding-right: 0.5em;
+}
+
+.embold-warning span {
+  color: #646970;
+}
+
+.embold-status-box {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f0f0f1;
+  border-left: 4px solid #72aee6;
+}
+
+.embold-divider {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  border-color: #dcdcde;
 }
