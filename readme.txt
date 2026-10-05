@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.10.4
+Stable tag: 1.11.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -57,7 +57,7 @@ For a complete list of all available constants (including SMTP settings, securit
 
 == Changelog ==
 
-= Unreleased =
+= 1.11.0 =
 * Add "Highlight Custom HTML Blocks" feature: outlines and labels Custom HTML blocks in the block editor so embed code made only of script tags doesn't look like an empty block. On by default; toggle via the settings page or the EMBOLD_HIGHLIGHT_HTML_BLOCKS constant.
 * Reorganize the settings page into tabs: Security, Mail, Admin & Editor, Performance and Developer.
 * Fix: saving the settings page no longer turns off options locked by a constant, or loosens user restrictions when LOOSE_USER_RESTRICTIONS is set.
