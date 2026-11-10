@@ -67,8 +67,30 @@ class DisableMailService {
 			9999
 		);
 
+		$this->disableMailgunApi();
+
 		// Deactivate conflicting mail plugins (mirrors previous behavior)
 		add_action( 'admin_init', [ $this, 'disableKnownMailPlugins' ] );
+	}
+
+	/**
+	 * Mailgun's API mode replaces wp_mail() and skips both pre_wp_mail and
+	 * phpmailer_init, but it sends nothing without an API key, which it reads
+	 * at send time. Covers the requests before the plugin is deactivated.
+	 */
+	private function disableMailgunApi(): void {
+		add_filter(
+			'option_mailgun',
+			function ( $options ) {
+				if ( ! is_array( $options ) ) {
+					return $options;
+				}
+
+				$options['apiKey'] = '';
+
+				return $options;
+			}
+		);
 	}
 
 	/**
@@ -122,6 +144,8 @@ class DisableMailService {
 			},
 			9999
 		);
+
+		$this->disableMailgunApi();
 
 		// Disable conflicting plugins
 		$this->disableKnownMailPlugins();
