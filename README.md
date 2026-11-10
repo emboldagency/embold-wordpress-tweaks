@@ -105,6 +105,20 @@ define('DISABLE_MAIL', false);
 4. Plugin Options (Settings Page).
 5. Environment Defaults.
 
+### Gravity Forms notifications
+
+Gravity Forms 2.10 queues notifications for WP-Cron rather than sending them during the
+submission. Where the cron loopback cannot reach the site (password-protected staging, for
+example), the queue never drains and notifications are lost with no error recorded anywhere.
+
+Outside production the plugin sends them inline instead, which also surfaces mail failures as
+a note on the entry. Turn it off per site on the settings page, or pin it with a constant:
+
+```php
+define('EMBOLD_SYNC_GF_NOTIFICATIONS', true);  // force inline, including on production
+define('EMBOLD_SYNC_GF_NOTIFICATIONS', false); // always leave Gravity Forms queueing
+```
+
 ## Constants
 
 ### Core & security

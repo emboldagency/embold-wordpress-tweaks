@@ -101,6 +101,9 @@ function embold_wordpress_tweaks_init() {
 	// Notice Suppression
 	$plugin->enableNoticeSuppression();
 
+	// Send Gravity Forms notifications inline outside production
+	$plugin->forceSyncGravityFormsNotifications();
+
 	// Register mail control service
 	$mailService = new DisableMailService();
 	$mailService->register();
