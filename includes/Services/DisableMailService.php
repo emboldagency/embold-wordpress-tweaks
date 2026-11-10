@@ -128,7 +128,10 @@ class DisableMailService {
 	}
 
 	public function disableKnownMailPlugins(): void {
+		// These replace the pluggable wp_mail(), so they send straight through their
+		// own transport and never reach the phpmailer_init override below.
 		$plugins_to_disable = [
+			'gravitysmtp/gravitysmtp.php',
 			'mailgun/mailgun.php',
 			'sparkpost/sparkpost.php',
 		];
