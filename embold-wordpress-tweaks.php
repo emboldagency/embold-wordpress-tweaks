@@ -4,7 +4,7 @@
  * Plugin Name:        emBold WordPress Tweaks
  * Plugin URI:         https://embold.com
  * Description:        A collection of our common tweaks and upgrades to WordPress.
- * Version:            1.11.0
+ * Version:            1.12.0
  * Author:             emBold
  * Author URI:         https://embold.com/
  * Primary Branch:     master
@@ -100,6 +100,9 @@ function embold_wordpress_tweaks_init() {
 
 	// Notice Suppression
 	$plugin->enableNoticeSuppression();
+
+	// Send Gravity Forms notifications inline outside production
+	$plugin->forceSyncGravityFormsNotifications();
 
 	// Register mail control service
 	$mailService = new DisableMailService();

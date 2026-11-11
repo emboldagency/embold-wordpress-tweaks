@@ -309,7 +309,7 @@ class SettingsPage {
 			'mail'        => [
 				'label'    => __( 'Mail', 'embold-wordpress-tweaks' ),
 				'sections' => [
-					'embold_tweaks_mail' => [
+					'embold_tweaks_mail'              => [
 						'title'  => __( 'Mail Behavior', 'embold-wordpress-tweaks' ),
 						'desc'   => __( 'Control how mail behaves per environment.', 'embold-wordpress-tweaks' ),
 						'fields' => [
@@ -363,6 +363,17 @@ class SettingsPage {
 								'desc'  => __( 'Leave blank for no encryption, or use <code>ssl</code> or <code>tls</code>.', 'embold-wordpress-tweaks' ),
 								'const' => 'EMBOLD_SMTP_SECURE',
 								'class' => 'embold-smtp-field',
+							],
+						],
+					],
+					'embold_tweaks_mail_gravityforms' => [
+						'title'  => __( 'Gravity Forms', 'embold-wordpress-tweaks' ),
+						'desc'   => __( 'How Gravity Forms hands notifications to WordPress.', 'embold-wordpress-tweaks' ),
+						'fields' => [
+							'sync_gf_notifications' => [
+								'label' => __( 'Send Notifications Inline', 'embold-wordpress-tweaks' ),
+								'const' => 'EMBOLD_SYNC_GF_NOTIFICATIONS',
+								'desc'  => __( 'Sends notifications during the submission instead of queueing them for WP-Cron. Gravity Forms 2.10 queues them by default, which silently loses them wherever the cron loopback cannot reach the site, such as password-protected staging. Applies outside production only, unless the constant is set.', 'embold-wordpress-tweaks' ),
 							],
 						],
 					],
@@ -1173,6 +1184,7 @@ class SettingsPage {
 			'elevated_emails'               => [],
 			'loose_user_restrictions'       => false,
 			'mail_mode'                     => 'auto',
+			'sync_gf_notifications'         => true,
 			'enable_svg'                    => true,
 			'disable_xmlrpc'                => true,
 			'disable_wp_emoji'              => true,

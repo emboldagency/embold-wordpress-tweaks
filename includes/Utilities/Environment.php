@@ -11,42 +11,7 @@ class Environment {
 			return self::$environment;
 		}
 
-		$env = 'production';
-
-		if ( function_exists( 'wp_get_environment_type' ) ) {
-			$env = wp_get_environment_type();
-		} elseif ( defined( 'WP_ENVIRONMENT_TYPE' ) ) {
-			$env = WP_ENVIRONMENT_TYPE;
-		} elseif ( defined( 'WP_ENV' ) ) {
-			$env = WP_ENV;
-		}
-
-		// Normalize common aliases
-		switch ( $env ) {
-			case 'local':
-				$env = 'development';
-				break;
-			case 'maintenance':
-				$env = 'staging';
-				break;
-			default:
-				break;
-		}
-
-		if ( ! in_array( $env, self::ALLOWED_ENVS, true ) ) {
-			$host = self::getHost();
-			if ( ! empty( $host ) ) {
-				if ( self::hostMatches( $host, [ '.local', 'localhost', '.embold.dev' ] ) ) {
-					$env = 'development';
-				} elseif ( self::hostMatches( $host, [ '.net', 'staging.', '.wphaven.dev' ] ) ) {
-					$env = 'staging';
-				}
-			}
-		}
-
-		if ( ! in_array( $env, self::ALLOWED_ENVS, true ) ) {
-			$env = 'production';
-		}
+		$env = self::configured() ?? self::inferFromHost();
 
 		self::$environment = $env;
 		return self::$environment;
@@ -56,26 +21,64 @@ class Environment {
 		return self::get() === 'production';
 	}
 
-	private static function getHost(): string {
-		$host = '';
-		if ( isset( $_SERVER['HTTP_HOST'] ) ) {
-			$host = sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) );
-		} elseif ( isset( $_SERVER['SERVER_NAME'] ) ) {
-			$host = sanitize_text_field( wp_unslash( $_SERVER['SERVER_NAME'] ) );
+	/**
+	 * The first valid WP_ENVIRONMENT_TYPE or legacy WP_ENV, as a constant or
+	 * environment variable. Read directly: wp_get_environment_type() ignores
+	 * WP_ENV and reports its own 'production' default like a real setting.
+	 */
+	private static function configured(): ?string {
+		foreach ( [ 'WP_ENVIRONMENT_TYPE', 'WP_ENV' ] as $name ) {
+			$value = defined( $name ) ? constant( $name ) : getenv( $name );
+			$env   = $value === 'local' ? 'development' : $value;
+
+			if ( in_array( $env, self::ALLOWED_ENVS, true ) ) {
+				return $env;
+			}
 		}
+
+		return null;
+	}
+
+	/**
+	 * Best guess from the site's own home URL, defaulting to production.
+	 * The request Host header is never used, since a catch-all vhost would
+	 * let any client pick the environment.
+	 */
+	private static function inferFromHost(): string {
+		$host = self::getHost();
+
+		if ( $host === '' ) {
+			return 'production';
+		}
+
+		if ( $host === 'localhost' || self::endsWithAny( $host, [ '.local', '.localhost', '.embold.dev' ] ) ) {
+			return 'development';
+		}
+
+		if ( str_starts_with( $host, 'staging.' ) || self::endsWithAny( $host, [ '.embold.net', '.wphaven.dev' ] ) ) {
+			return 'staging';
+		}
+
+		return 'production';
+	}
+
+	private static function getHost(): string {
+		if ( ! function_exists( 'get_option' ) ) {
+			return '';
+		}
+
+		$host = (string) wp_parse_url( (string) get_option( 'home', '' ), PHP_URL_HOST );
 
 		return trim( strtolower( $host ) );
 	}
 
-	private static function hostMatches( string $host, array $patterns ): bool {
-		foreach ( $patterns as $pattern ) {
-			if ( $pattern[0] === '.' && str_ends_with( $host, $pattern ) ) {
-				return true;
-			}
-			if ( $pattern[0] !== '.' && str_contains( $host, $pattern ) ) {
+	private static function endsWithAny( string $host, array $suffixes ): bool {
+		foreach ( $suffixes as $suffix ) {
+			if ( str_ends_with( $host, $suffix ) ) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 }

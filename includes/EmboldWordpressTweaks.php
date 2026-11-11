@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Utilities\Environment;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class EmboldWordpressTweaks {
@@ -477,6 +478,29 @@ class EmboldWordpressTweaks {
 				}
 			);
 		}
+	}
+
+	/**
+	 * Send Gravity Forms notifications inline outside production.
+	 *
+	 * Gravity Forms 2.10 queues notifications for WP-Cron instead of sending them
+	 * during the submission. Where the cron loopback cannot reach the site, such as
+	 * password-protected staging, the queue never drains and notifications are lost
+	 * with no error anywhere. Sending inline also surfaces mail failures on the
+	 * entry itself, which is what you want while testing a form.
+	 */
+	public function forceSyncGravityFormsNotifications() {
+		if ( ! $this->isFeatureEnabled( 'sync_gf_notifications', 'EMBOLD_SYNC_GF_NOTIFICATIONS' ) ) {
+			return;
+		}
+
+		// Production has working cron and real send volume, so leave the queue alone
+		// unless the constant explicitly asks for inline sending.
+		if ( Environment::isProduction() && ! defined( 'EMBOLD_SYNC_GF_NOTIFICATIONS' ) ) {
+			return;
+		}
+
+		add_filter( 'gform_is_asynchronous_notifications_enabled', '__return_false' );
 	}
 
 	/**
