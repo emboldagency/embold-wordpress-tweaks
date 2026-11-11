@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.11.0
+Stable tag: 1.12.0
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -56,6 +56,12 @@ This plugin uses constants in wp-config.php to control behavior across environme
 For a complete list of all available constants (including SMTP settings, security toggles, and performance options), please refer to the [GitHub Repository](https://github.com/emboldagency/embold-wordpress-tweaks).
 
 == Changelog ==
+
+= 1.12.0 =
+* Fix: Mailgun in API mode no longer sends real mail while mail is blocked or overridden. It replaces wp_mail() and skipped both, so non-production sites sent through it until an admin visit deactivated the plugin.
+* Fix: a site that sets only the legacy WP_ENV, or no environment at all, is no longer treated as production. Unconfigured sites are inferred from the home URL (*.embold.net, *.wphaven.dev and staging.* read as staging).
+* Fix: Gravity SMTP is deactivated while mail is blocked or overridden, since it ignored the SMTP override.
+* Send Gravity Forms notifications inline outside production instead of queueing them for WP-Cron, which silently lost them where the cron loopback can't reach the site. Toggle on the Mail tab or with EMBOLD_SYNC_GF_NOTIFICATIONS.
 
 = 1.11.0 =
 * Add "Highlight Custom HTML Blocks" feature: outlines and labels Custom HTML blocks in the block editor so embed code made only of script tags doesn't look like an empty block. On by default; toggle via the settings page or the EMBOLD_HIGHLIGHT_HTML_BLOCKS constant.
