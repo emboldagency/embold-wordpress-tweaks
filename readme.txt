@@ -3,7 +3,7 @@ Contributors: itsjsutxan, emboldtyler
 Tags: tweaks, improvements
 Requires at least: 6.0
 Tested up to: 6.9.0
-Stable tag: 1.12.0
+Stable tag: 1.12.1
 Requires PHP: 7.4
 
 A collection of our common tweaks and upgrades to WordPress.
@@ -56,6 +56,9 @@ This plugin uses constants in wp-config.php to control behavior across environme
 For a complete list of all available constants (including SMTP settings, security toggles, and performance options), please refer to the [GitHub Repository](https://github.com/emboldagency/embold-wordpress-tweaks).
 
 == Changelog ==
+
+= 1.12.1 =
+* Fix: the first save of Elevated Admin Emails is no longer lost when WP Haven Connect is active. On a site whose settings had never been saved (or after a reset), the emails only stuck on the second save.
 
 = 1.12.0 =
 * Fix: Mailgun in API mode no longer sends real mail while mail is blocked or overridden. It replaces wp_mail() and skipped both, so non-production sites sent through it until an admin visit deactivated the plugin.
