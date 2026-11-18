@@ -1137,20 +1137,20 @@ class SettingsPage {
 		}
 
 		// --- Elevated Emails ---
-		// Skip if locked by constant.
-		if ( ! ( defined( 'ELEVATED_EMAILS' ) && constant( 'ELEVATED_EMAILS' ) ) ) {
+		// Skip if locked by constant, or if the field wasn't submitted: on the first
+		// save WordPress runs this callback a second time (update_option falls through
+		// to add_option) with our own output, which has no elevated_emails key.
+		if ( ! ( defined( 'ELEVATED_EMAILS' ) && constant( 'ELEVATED_EMAILS' ) ) && isset( $input['elevated_emails'] ) ) {
 			$emails = [];
-			if ( isset( $input['elevated_emails'] ) ) {
-				if ( is_array( $input['elevated_emails'] ) ) {
-					$emails = array_map( 'sanitize_email', $input['elevated_emails'] );
-				} else {
-					$raw   = is_string( $input['elevated_emails'] ) ? $input['elevated_emails'] : '';
-					$parts = preg_split( '/[\r\n,;]+/', $raw );
-					foreach ( $parts as $p ) {
-						$p = trim( $p );
-						if ( ! empty( $p ) ) {
-							$emails[] = sanitize_email( $p );
-						}
+			if ( is_array( $input['elevated_emails'] ) ) {
+				$emails = array_map( 'sanitize_email', $input['elevated_emails'] );
+			} else {
+				$raw   = is_string( $input['elevated_emails'] ) ? $input['elevated_emails'] : '';
+				$parts = preg_split( '/[\r\n,;]+/', $raw );
+				foreach ( $parts as $p ) {
+					$p = trim( $p );
+					if ( ! empty( $p ) ) {
+						$emails[] = sanitize_email( $p );
 					}
 				}
 			}
